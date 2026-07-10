@@ -37,13 +37,19 @@ export default function SustainableTech() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-14">
-          <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">Green Innovation</p>
+          <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
+            Green Innovation / সবুজ উদ্ভাবন
+          </p>
           <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900">
             Sustainable Technology Showcase
           </h2>
+          <p className="text-[#0A5C36] font-semibold text-base mt-1">টেকসই প্রযুক্তির প্রদর্শনী</p>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto leading-relaxed">
             Origin Agro is powered by cutting-edge green technology that minimizes environmental impact
             while maximizing operational efficiency.
+          </p>
+          <p className="text-gray-400 text-sm mt-1 max-w-xl mx-auto">
+            অরিজিন অ্যাগ্রো অত্যাধুনিক সবুজ প্রযুক্তিতে পরিচালিত যা পরিবেশগত প্রভাব হ্রাস করে।
           </p>
         </div>
 

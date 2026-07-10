@@ -32,14 +32,21 @@ function XIcon() {
   )
 }
 
-const quickLinks = ['Home', 'About Us', 'Our Projects', 'Gallery', 'FAQ', 'Contact']
+const quickLinks = [
+  { en: 'Home', bn: 'হোম', href: '#' },
+  { en: 'About Us', bn: 'আমাদের সম্পর্কে', href: '#team' },
+  { en: 'Our Projects', bn: 'আমাদের প্রকল্প', href: '#projects' },
+  { en: 'Smart Invest', bn: 'বিনিয়োগ', href: '#invest' },
+  { en: 'Shop', bn: 'শপ', href: '#shop' },
+  { en: 'FAQ', bn: 'প্রশ্নোত্তর', href: '#faq' },
+]
 const services = [
-  'Agro Investment',
-  'Eco Resort Booking',
-  'Livestock Purchase',
-  'CSR Partnership',
-  'Farm Tours',
-  'Organic Produce',
+  { en: 'Agro Investment', bn: 'কৃষি বিনিয়োগ' },
+  { en: 'Eco Resort Booking', bn: 'ইকো রিসোর্ট বুকিং' },
+  { en: 'Livestock Purchase', bn: 'পশু ক্রয়' },
+  { en: 'Organic Produce', bn: 'জৈব পণ্য' },
+  { en: 'Dairy & Honey', bn: 'দুগ্ধ ও মধু' },
+  { en: 'CSR Partnership', bn: 'সিএসআর অংশীদারিত্ব' },
 ]
 
 export default function MegaFooter() {
@@ -105,16 +112,18 @@ export default function MegaFooter() {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h4 className="font-extrabold text-base mb-5 text-white">Quick Links</h4>
+            <h4 className="font-extrabold text-base mb-1 text-white">Quick Links</h4>
+            <p className="text-white/50 text-xs mb-4">দ্রুত লিংক</p>
             <ul className="space-y-2.5">
               {quickLinks.map((link) => (
-                <li key={link}>
+                <li key={link.en}>
                   <a
-                    href="#"
+                    href={link.href}
                     className="text-white/70 hover:text-[#F26522] text-sm transition-colors flex items-center gap-2 group"
                   >
                     <span className="w-1.5 h-1.5 bg-[#F26522] rounded-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {link}
+                    <span>{link.en}</span>
+                    <span className="text-white/40 text-xs ml-auto">{link.bn}</span>
                   </a>
                 </li>
               ))}
@@ -123,16 +132,18 @@ export default function MegaFooter() {
 
           {/* Column 3: Services */}
           <div>
-            <h4 className="font-extrabold text-base mb-5 text-white">Our Services</h4>
+            <h4 className="font-extrabold text-base mb-1 text-white">Our Services</h4>
+            <p className="text-white/50 text-xs mb-4">আমাদের সেবাসমূহ</p>
             <ul className="space-y-2.5">
               {services.map((service) => (
-                <li key={service}>
+                <li key={service.en}>
                   <a
                     href="#"
                     className="text-white/70 hover:text-[#F26522] text-sm transition-colors flex items-center gap-2 group"
                   >
                     <span className="w-1.5 h-1.5 bg-[#F26522] rounded-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {service}
+                    <span>{service.en}</span>
+                    <span className="text-white/40 text-xs ml-auto">{service.bn}</span>
                   </a>
                 </li>
               ))}
@@ -141,7 +152,8 @@ export default function MegaFooter() {
 
           {/* Column 4: Contact */}
           <div>
-            <h4 className="font-extrabold text-base mb-5 text-white">Contact Us</h4>
+            <h4 className="font-extrabold text-base mb-1 text-white">Contact Us</h4>
+            <p className="text-white/50 text-xs mb-4">যোগাযোগ করুন</p>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#F26522] shrink-0 mt-0.5" />
@@ -190,7 +202,7 @@ export default function MegaFooter() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10 py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-white/50">
-          <p>© 2025 Origin Agro Ltd. All rights reserved.</p>
+          <p>© 2025 Origin Agro Ltd. All rights reserved. / সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex gap-5">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

@@ -4,12 +4,13 @@ import { useState } from 'react'
 import { Menu, X, Leaf } from 'lucide-react'
 
 const navLinks = [
-  { label: 'Home', href: '#' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'About Us', href: '#team' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#footer' },
+  { label: 'Home', labelBn: 'হোম', href: '#' },
+  { label: 'Projects', labelBn: 'প্রকল্প', href: '#projects' },
+  { label: 'Invest', labelBn: 'বিনিয়োগ', href: '#invest' },
+  { label: 'Shop', labelBn: 'শপ', href: '#shop' },
+  { label: 'About', labelBn: 'আমাদের', href: '#team' },
+  { label: 'FAQ', labelBn: 'প্রশ্নোত্তর', href: '#faq' },
+  { label: 'Contact', labelBn: 'যোগাযোগ', href: '#footer' },
 ]
 
 export default function Navbar() {
@@ -35,9 +36,10 @@ export default function Navbar() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-gray-700 hover:text-[#0A5C36] font-medium text-sm transition-colors relative group"
+                className="text-gray-700 hover:text-[#0A5C36] font-medium text-sm transition-colors relative group flex flex-col items-center leading-tight"
               >
-                {link.label}
+                <span>{link.label}</span>
+                <span className="text-[10px] text-gray-400 group-hover:text-[#0A5C36] transition-colors">{link.labelBn}</span>
                 <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#F26522] group-hover:w-full transition-all duration-300" />
               </a>
             ))}
@@ -46,10 +48,11 @@ export default function Navbar() {
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-3">
             <a
-              href="#projects"
-              className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-5 py-2.5 rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg"
+              href="#invest"
+              className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-5 py-2.5 rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg flex flex-col items-center leading-tight"
             >
-              Book Now
+              <span>Invest Now</span>
+              <span className="text-[10px] font-normal opacity-80">বিনিয়োগ করুন</span>
             </a>
           </div>
 
@@ -72,10 +75,11 @@ export default function Navbar() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-gray-700 hover:text-[#0A5C36] font-medium py-1.5 border-b border-gray-50"
+                className="text-gray-700 hover:text-[#0A5C36] font-medium py-1.5 border-b border-gray-50 flex items-center justify-between"
                 onClick={() => setMobileOpen(false)}
               >
-                {link.label}
+                <span>{link.label}</span>
+                <span className="text-xs text-gray-400">{link.labelBn}</span>
               </a>
             ))}
             <a

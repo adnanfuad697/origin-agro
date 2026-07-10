@@ -43,13 +43,19 @@ export default function LivestockShop() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-14">
-          <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">Eid Cattle Shop</p>
+          <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
+            Eid Cattle Shop / কোরবানির পশুর দোকান
+          </p>
           <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 text-balance">
             Choose Your Livestock From the Best Collection
           </h2>
+          <p className="text-[#0A5C36] font-semibold text-base mt-1">সেরা সংগ্রহ থেকে আপনার পশু বেছে নিন</p>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto leading-relaxed">
             All our cattle are naturally raised, Shariah-certified, and ready for Qurbani. Browse our premium
             selection and book online with free delivery within Dhaka.
+          </p>
+          <p className="text-gray-400 text-sm mt-1 max-w-xl mx-auto">
+            আমাদের সব পশু প্রাকৃতিকভাবে লালিত, শরিয়াহ-সনদপ্রাপ্ত এবং কোরবানির জন্য প্রস্তুত।
           </p>
         </div>
 

@@ -43,13 +43,17 @@ export default function FaqSection() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left: heading */}
           <div className="lg:col-span-1">
-            <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">FAQs</p>
+            <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
+              FAQs / সাধারণ জিজ্ঞাসা
+            </p>
             <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 text-balance">
               Frequently Asked Questions
             </h2>
+            <p className="text-[#0A5C36] font-semibold text-base mt-1">প্রায়শই জিজ্ঞাসিত প্রশ্নসমূহ</p>
             <p className="text-gray-500 mt-4 leading-relaxed text-sm">
               Have more questions? Reach out to our team directly and we&apos;ll get back to you within 24 hours.
             </p>
+            <p className="text-gray-400 text-xs mt-1">আরও প্রশ্ন আছে? সরাসরি আমাদের দলের সাথে যোগাযোগ করুন।</p>
             <a
               href="#footer"
               className="inline-block mt-6 bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors duration-200 text-sm"

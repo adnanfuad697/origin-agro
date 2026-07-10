@@ -4,7 +4,8 @@ import HeroSection from '@/components/hero-section'
 import ExecutiveTeam from '@/components/executive-team'
 import ProjectOverview from '@/components/project-overview'
 import SustainableTech from '@/components/sustainable-tech'
-import LivestockShop from '@/components/livestock-shop'
+import InvestorSection from '@/components/investor-section'
+import ProductMarketplace from '@/components/product-marketplace'
 import FaqSection from '@/components/faq-section'
 import MegaFooter from '@/components/mega-footer'
 
@@ -14,10 +15,11 @@ export default function HomePage() {
       <TopBar />
       <Navbar />
       <HeroSection />
-      <ExecutiveTeam />
       <ProjectOverview />
+      <InvestorSection />
       <SustainableTech />
-      <LivestockShop />
+      <ProductMarketplace />
+      <ExecutiveTeam />
       <FaqSection />
       <MegaFooter />
     </main>
