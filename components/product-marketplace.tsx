@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase' // নিশ্চিত করো যে এই পাথটি সঠিক
+import { supabase } from '@/lib/supabase' 
 import { ShoppingCart, Eye, Star, Tag, Truck, BadgeCheck, ShieldCheck } from 'lucide-react'
 
 // প্রোডাক্ট ইন্টারফেস
@@ -47,14 +47,14 @@ export default function ProductMarketplace() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
-  // ডাটা ফেচিং
+  // ডাটাবেস থেকে ডাটা আনা
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true)
       const { data, error } = await supabase.from('products').select('*')
       if (error) {
         console.error("Error fetching products:", error)
-      } else {
+      } else if (data) {
         setProducts(data as Product[])
       }
       setLoading(false)
@@ -62,12 +62,9 @@ export default function ProductMarketplace() {
     fetchProducts()
   }, [])
 
-  // ডাইনামিক ক্যাটাগরি এবং কাউন্ট তৈরি
+  // ক্যাটাগরি ফিল্টারিং
   const uniqueCategories = ['all', ...Array.from(new Set(products.map(p => p.category)))]
   
-  const getCount = (cat: string) => cat === 'all' ? products.length : products.filter(p => p.category === cat).length
-
-  // ফিল্টারিং
   const filtered = activeCategory === 'all'
     ? products
     : products.filter((p) => p.category === activeCategory)
@@ -95,30 +92,24 @@ export default function ProductMarketplace() {
               }`}
             >
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-xs">
-                {getCount(cat)}
-              </span>
             </button>
           ))}
         </div>
 
         {/* Products Grid */}
         {loading ? (
-          <div className="text-center py-20 text-gray-500">Loading products from database...</div>
+          <div className="text-center py-20 text-gray-500">Loading products...</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map((product) => (
               <div key={product.id} className="bg-white rounded-2xl p-4 shadow-sm border flex flex-col">
-                <div className="relative h-40 mb-3 overflow-hidden rounded-lg">
+                <div className="relative h-40 mb-3 overflow-hidden rounded-lg bg-gray-100">
+                   {/* ইমেজ পাথ যদি ডাটাবেসে না থাকে তাহলে একটি placeholder দেখাবে */}
                   <Image src={product.image || '/placeholder.png'} alt={product.name} fill className="object-cover" />
                 </div>
                 <h3 className="font-bold text-sm">{product.name}</h3>
                 <p className="text-xs text-[#0A5C36] mb-2">{product.nameBn}</p>
                 <p className="text-lg font-extrabold text-[#0A5C36] mt-auto">{product.price}</p>
-                
-                <div className="flex gap-2 mt-3">
-                  <button className="flex-1 py-2 bg-[#0A5C36] text-white rounded-lg text-xs">Add to Cart</button>
-                </div>
               </div>
             ))}
           </div>
