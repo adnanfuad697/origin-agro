@@ -83,17 +83,9 @@ export default function ExecutiveTeam() {
         {!loading && team.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {team.map((member) => (
-              <div
-                key={member.id}
-                className="bg-[#F7F4EE] rounded-2xl p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300 border border-gray-100 group"
-              >
+              <div key={member.id} className="bg-[#F7F4EE] rounded-2xl p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300 border border-gray-100 group">
                 <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-[#0A5C36] shadow-lg mb-5 group-hover:border-[#F26522] transition-colors duration-300">
-                  <Image
-                    src={member.image || '/placeholder.jpg'}
-                    alt={`Portrait of ${member.name}`}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={member.image || '/placeholder.jpg'} alt={`Portrait of ${member.name}`} fill className="object-cover" />
                 </div>
 
                 <h3 className="text-xl font-extrabold text-gray-900">{member.name}</h3>
@@ -106,24 +98,12 @@ export default function ExecutiveTeam() {
                 {(member.linkedin || member.twitter) && (
                   <div className="flex items-center gap-3 mt-6">
                     {member.linkedin && (
-                      
-                        href={member.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
-                        aria-label={`${member.name} LinkedIn`}
-                      >
+                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors" aria-label={`${member.name} LinkedIn`}>
                         <LinkedinIcon />
                       </a>
                     )}
                     {member.twitter && (
-                      
-                        href={member.twitter}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
-                        aria-label={`${member.name} X (Twitter)`}
-                      >
+                      <a href={member.twitter} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors" aria-label={`${member.name} X (Twitter)`}>
                         <XIcon />
                       </a>
                     )}
