@@ -54,11 +54,7 @@ export default function FaqSection() {
               Have more questions? Reach out to our team directly and we&apos;ll get back to you within 24 hours.
             </p>
             <p className="text-gray-400 text-xs mt-1">আরও প্রশ্ন আছে? সরাসরি আমাদের দলের সাথে যোগাযোগ করুন।</p>
-            
-              href="#footer"
-              className="inline-block mt-6 bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors duration-200 text-sm">
-              Contact Us
-            </a>
+            <a href="#footer" className="inline-block mt-6 bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors duration-200 text-sm">Contact Us</a>
           </div>
 
           <div className="lg:col-span-2 space-y-3">
