@@ -44,7 +44,7 @@ export default function TopBar() {
             <span>My Account</span>
           </a>
           <a
-            href="#livestock"
+            href="/?category=Qurbani+Cattle#shop"
             className="bg-[#F26522] hover:bg-[#d4551a] text-white font-semibold px-3 py-1 rounded transition-colors text-xs whitespace-nowrap"
           >
             🐄 Buy Cattle / কোরবানির পশু
