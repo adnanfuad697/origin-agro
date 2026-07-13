@@ -51,6 +51,12 @@ export default function ProductMarketplace() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const cat = params.get('category')
+    if (cat) setActiveCategory(cat)
+  }, [])
+
+  useEffect(() => {
     async function fetchProducts() {
       setLoading(true)
       const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true })
