@@ -21,10 +21,7 @@ export default function TopBar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={toggleLang}
-            className="flex items-center gap-1 hover:text-[#F26522] transition-colors border border-white/30 rounded px-2 py-0.5"
-            aria-label="Toggle language">
+          <button onClick={toggleLang} className="flex items-center gap-1 hover:text-[#F26522] transition-colors border border-white/30 rounded px-2 py-0.5" aria-label="Toggle language">
             <Globe className="w-3.5 h-3.5" />
             <span className="font-semibold">{lang}</span>
           </button>
@@ -32,9 +29,7 @@ export default function TopBar() {
             <User className="w-3.5 h-3.5" />
             <span>{lang === 'EN' ? 'My Account' : 'আমার অ্যাকাউন্ট'}</span>
           </a>
-          
-            href="/?category=Qurbani+Cattle#shop"
-            className="bg-[#F26522] hover:bg-[#d4551a] text-white font-semibold px-3 py-1 rounded transition-colors text-xs whitespace-nowrap">
+          <a href="/?category=Qurbani+Cattle#shop" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-semibold px-3 py-1 rounded transition-colors text-xs whitespace-nowrap">
             {lang === 'EN' ? '🐄 Buy Cattle' : '🐄 কোরবানির পশু'}
           </a>
         </div>
