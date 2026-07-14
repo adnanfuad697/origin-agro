@@ -152,7 +152,7 @@ export default function ProjectOverview() {
                       <p className="text-[#0A5C36] text-xs font-medium mb-2">{project.titleBn}</p>
                     )}
                     {project.description && (
-                      <p className="text-gray-500 text-sm leading-relaxed line-clamp-3">{project.description}</p>
+                      <p className="text-gray-500 text-sm leading-relaxed">{project.description}</p>
                     )}
                   </div>
                 </div>
