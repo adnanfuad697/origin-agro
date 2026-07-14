@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Noto_Serif_Bengali } from 'next/font/google'
+import { LanguageProvider } from '@/contexts/language-context'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -30,8 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn" className={`${inter.variable} ${notoSerifBengali.variable} bg-background`}>
-      <body className="antialiased font-sans">{children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+      <body className="antialiased font-sans">
+        <LanguageProvider>
+          {children}
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </LanguageProvider>
       </body>
     </html>
   )
