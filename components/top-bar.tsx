@@ -14,9 +14,9 @@ export default function TopBar() {
             <Phone className="w-3.5 h-3.5" />
             <span>+8801586-207756</span>
           </a>
-          <a href="mailto:info@originagro.com" className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors">
+          <a href="mailto:originagro0@gmail.com" className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors">
             <Mail className="w-3.5 h-3.5" />
-            <span>info@originagro.com</span>
+            <span>originagro0@gmail.com</span>
           </a>
         </div>
 
