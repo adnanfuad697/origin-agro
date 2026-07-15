@@ -10,9 +10,9 @@ export default function TopBar() {
     <div className="bg-[#063D24] text-white text-sm py-2 px-4">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-5">
-          <a href="tel:+8801700000000" className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors">
+          <a href="tel:+8801586-207756" className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors">
             <Phone className="w-3.5 h-3.5" />
-            <span>+880 170 000 0000</span>
+            <span>+8801586-207756</span>
           </a>
           <a href="mailto:info@originagro.com" className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors">
             <Mail className="w-3.5 h-3.5" />
