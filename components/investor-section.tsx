@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 import {
   TrendingUp,
   ShieldCheck,
@@ -14,76 +15,6 @@ import {
   FileText,
   CheckCircle2,
 } from 'lucide-react'
-
-const plans = [
-  {
-    id: 'starter',
-    name: 'Starter Unit',
-    nameBn: 'স্টার্টার ইউনিট',
-    units: '1 Unit',
-    price: '৳ 50,000',
-    annualReturn: '৳ 7,500',
-    returnPct: '15%',
-    tenure: '3 Years',
-    tenureBn: '৩ বছর',
-    badge: null,
-    features: [
-      { en: 'Shariah-Certified Investment', bn: 'শরিয়াহ সনদপ্রাপ্ত বিনিয়োগ' },
-      { en: 'Annual Profit Distribution', bn: 'বার্ষিক মুনাফা বিতরণ' },
-      { en: 'Farm Visit — 1x/year', bn: 'খামার পরিদর্শন — বছরে ১ বার' },
-      { en: 'Digital Investor Dashboard', bn: 'ডিজিটাল বিনিয়োগকারী ড্যাশবোর্ড' },
-    ],
-    bg: 'bg-white',
-    border: 'border-gray-200',
-    btnClass: 'bg-[#0A5C36] hover:bg-[#063D24] text-white',
-  },
-  {
-    id: 'growth',
-    name: 'Growth Pack',
-    nameBn: 'গ্রোথ প্যাক',
-    units: '5 Units',
-    price: '৳ 2,50,000',
-    annualReturn: '৳ 42,500',
-    returnPct: '17%',
-    tenure: '5 Years',
-    tenureBn: '৫ বছর',
-    badge: 'Most Popular / সবচেয়ে জনপ্রিয়',
-    features: [
-      { en: 'All Starter benefits', bn: 'স্টার্টারের সব সুবিধা' },
-      { en: 'Priority Eco Resort Booking', bn: 'প্রিয়রিটি ইকো রিসোর্ট বুকিং' },
-      { en: 'Farm Visit — 3x/year', bn: 'খামার পরিদর্শন — বছরে ৩ বার' },
-      { en: 'Quarterly Profit Reports', bn: 'ত্রৈমাসিক মুনাফা রিপোর্ট' },
-      { en: 'Dedicated Relationship Manager', bn: 'ডেডিকেটেড রিলেশনশিপ ম্যানেজার' },
-    ],
-    bg: 'bg-[#0A5C36]',
-    border: 'border-[#0A5C36]',
-    btnClass: 'bg-[#F26522] hover:bg-[#d4551a] text-white',
-    textInvert: true,
-  },
-  {
-    id: 'premium',
-    name: 'Premium Partner',
-    nameBn: 'প্রিমিয়াম পার্টনার',
-    units: '10+ Units',
-    price: '৳ 5,00,000+',
-    annualReturn: '৳ 95,000+',
-    returnPct: '19%+',
-    tenure: '7 Years',
-    tenureBn: '৭ বছর',
-    badge: null,
-    features: [
-      { en: 'All Growth Pack benefits', bn: 'গ্রোথ প্যাকের সব সুবিধা' },
-      { en: 'Free Qurbani Cattle Booking', bn: 'বিনামূল্যে কোরবানির পশু বুকিং' },
-      { en: 'Monthly Profit Reports', bn: 'মাসিক মুনাফা রিপোর্ট' },
-      { en: 'Board Meeting Invitation', bn: 'বোর্ড মিটিং আমন্ত্রণ' },
-      { en: 'Name on Investor Wall', bn: 'বিনিয়োগকারী দেয়ালে নাম' },
-      { en: 'Complimentary Resort Stay', bn: 'বিনামূল্যে রিসোর্ট থাকা' },
-    ],
-    bg: 'bg-white',
-    border: 'border-gray-200',
-    btnClass: 'bg-[#0A5C36] hover:bg-[#063D24] text-white',
-  },
-]
 
 const steps = [
   {
@@ -123,9 +54,56 @@ const steps = [
   },
 ]
 
+interface InvestmentPlan {
+  id: number
+  planKey: string
+  name: string
+  nameBn: string | null
+  description: string | null
+  descriptionBn: string | null
+  tenure: string | null
+  tenureBn: string | null
+  minAmount: number | null
+  companySharePct: number | null
+  investorSharePct: number | null
+}
+
 export default function InvestorSection() {
   const [amount, setAmount] = useState(50000)
   const [tenure, setTenure] = useState(3)
+  const [plans, setPlans] = useState<InvestmentPlan[]>([])
+  const [plansLoading, setPlansLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchPlans() {
+      setPlansLoading(true)
+      const { data, error } = await supabase
+        .from('investment_plans')
+        .select('*')
+        .order('display_order', { ascending: true })
+
+      if (error) {
+        console.error('Error fetching investment plans:', error)
+      } else if (data) {
+        const mapped: InvestmentPlan[] = data.map((row: any) => ({
+          id: row.id,
+          planKey: row.plan_key,
+          name: row.name,
+          nameBn: row.name_bn,
+          description: row.description,
+          descriptionBn: row.description_bn,
+          tenure: row.tenure,
+          tenureBn: row.tenure_bn,
+          minAmount: row.min_amount ? Number(row.min_amount) : null,
+          companySharePct: row.company_share_pct ? Number(row.company_share_pct) : null,
+          investorSharePct: row.investor_share_pct ? Number(row.investor_share_pct) : null,
+        }))
+        setPlans(mapped)
+      }
+      setPlansLoading(false)
+    }
+    fetchPlans()
+  }, [])
 
   const rate = amount >= 500000 ? 0.19 : amount >= 250000 ? 0.17 : 0.15
   const annual = Math.round(amount * rate)
@@ -161,10 +139,7 @@ export default function InvestorSection() {
             { icon: TrendingUp, en: 'Annual Returns', bn: 'বার্ষিক রিটার্ন', val: '15–19%' },
             { icon: BadgeCheck, en: 'Govt. Registered', bn: 'সরকারি নিবন্ধিত', val: 'RJSC' },
           ].map(({ icon: Icon, en, bn, val }) => (
-            <div
-              key={en}
-              className="bg-[#F7F4EE] rounded-2xl p-5 flex flex-col items-center text-center gap-2 border border-gray-100 hover:border-[#0A5C36]/30 hover:shadow-md transition-all duration-200"
-            >
+            <div key={en} className="bg-[#F7F4EE] rounded-2xl p-5 flex flex-col items-center text-center gap-2 border border-gray-100 hover:border-[#0A5C36]/30 hover:shadow-md transition-all duration-200">
               <div className="w-11 h-11 bg-[#0A5C36] rounded-xl flex items-center justify-center">
                 <Icon className="w-6 h-6 text-white" />
               </div>
@@ -176,77 +151,58 @@ export default function InvestorSection() {
         </div>
 
         {/* Investment Plans */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-2xl border-2 ${plan.border} ${plan.bg} overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-xl`}
-            >
-              {plan.badge && (
-                <div className="absolute top-4 right-4 bg-[#F26522] text-white text-xs font-bold px-3 py-1 rounded-full">
-                  {plan.badge}
-                </div>
-              )}
-              <div className={`p-7 flex flex-col flex-1 ${plan.textInvert ? 'text-white' : ''}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${plan.textInvert ? 'text-white/60' : 'text-[#F26522]'}`}>
-                  {plan.units}
-                </p>
-                <h3 className={`text-2xl font-extrabold mb-0.5 ${plan.textInvert ? 'text-white' : 'text-gray-900'}`}>
-                  {plan.name}
-                </h3>
-                <p className={`text-sm mb-6 ${plan.textInvert ? 'text-white/70' : 'text-gray-500'}`}>{plan.nameBn}</p>
+        {plansLoading && <div className="text-center py-14 text-gray-500 mb-20">Loading investment plans...</div>}
 
-                <div className={`rounded-xl p-4 mb-6 ${plan.textInvert ? 'bg-white/10' : 'bg-[#F7F4EE]'}`}>
-                  <p className={`text-3xl font-extrabold ${plan.textInvert ? 'text-white' : 'text-[#0A5C36]'}`}>
-                    {plan.price}
-                  </p>
-                  <p className={`text-xs mt-1 ${plan.textInvert ? 'text-white/60' : 'text-gray-500'}`}>
-                    Minimum Investment / ন্যূনতম বিনিয়োগ
-                  </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <div>
-                      <p className={`text-lg font-extrabold ${plan.textInvert ? 'text-[#F26522]' : 'text-[#F26522]'}`}>
-                        {plan.returnPct} / yr
-                      </p>
-                      <p className={`text-xs ${plan.textInvert ? 'text-white/60' : 'text-gray-500'}`}>Annual Return</p>
-                    </div>
-                    <div className={`w-px h-10 ${plan.textInvert ? 'bg-white/20' : 'bg-gray-300'}`} />
-                    <div>
-                      <p className={`text-lg font-extrabold ${plan.textInvert ? 'text-white' : 'text-gray-800'}`}>
-                        {plan.tenure}
-                      </p>
-                      <p className={`text-xs ${plan.textInvert ? 'text-white/60' : 'text-gray-500'}`}>{plan.tenureBn}</p>
+        {!plansLoading && plans.length === 0 && (
+          <div className="text-center py-14 text-gray-500 mb-20">Investment plans coming soon.</div>
+        )}
+
+        {!plansLoading && plans.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+            {plans.map((plan) => (
+              <div key={plan.id} className="relative rounded-2xl border-2 border-[#0A5C36]/20 bg-white overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-xl">
+                <div className="p-7 flex flex-col flex-1">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-1 text-[#F26522]">Mudarabah Plan</p>
+                  <h3 className="text-2xl font-extrabold mb-0.5 text-gray-900">{plan.name}</h3>
+                  {plan.nameBn && <p className="text-sm mb-4 text-gray-500">{plan.nameBn}</p>}
+
+                  {plan.description && <p className="text-sm text-gray-600 leading-relaxed mb-2">{plan.description}</p>}
+                  {plan.descriptionBn && <p className="text-xs text-gray-400 leading-relaxed mb-5">{plan.descriptionBn}</p>}
+
+                  <div className="rounded-xl p-4 mb-6 bg-[#F7F4EE]">
+                    {plan.minAmount && (
+                      <>
+                        <p className="text-3xl font-extrabold text-[#0A5C36]">৳ {plan.minAmount.toLocaleString('en-IN')}+</p>
+                        <p className="text-xs mt-1 text-gray-500">Minimum Investment / ন্যূনতম বিনিয়োগ</p>
+                      </>
+                    )}
+                    <div className="flex items-center gap-4 mt-3">
+                      <div>
+                        <p className="text-lg font-extrabold text-[#F26522]">{plan.tenure}</p>
+                        <p className="text-xs text-gray-500">{plan.tenureBn}</p>
+                      </div>
+                      <div className="w-px h-10 bg-gray-300" />
+                      <div>
+                        <p className="text-lg font-extrabold text-gray-800">{plan.companySharePct}:{plan.investorSharePct}</p>
+                        <p className="text-xs text-gray-500">Company : Investor Profit Split</p>
+                      </div>
                     </div>
                   </div>
+
+                  <div className="mb-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                    <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                    <p className="text-xs text-amber-800 leading-relaxed">This is a profit-and-loss sharing Mudarabah partnership, not a fixed deposit. Capital may reduce in the event of a genuine business loss.</p>
+                  </div>
+
+                  <a href="#footer" className="w-full py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors duration-200 bg-[#0A5C36] hover:bg-[#063D24] text-white mt-auto">
+                    Learn More / বিস্তারিত জানুন
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
                 </div>
-
-                <ul className="space-y-2.5 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f.en} className="flex items-start gap-2.5">
-                      <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${plan.textInvert ? 'text-[#F26522]' : 'text-[#0A5C36]'}`} />
-                      <div>
-                        <span className={`text-sm font-medium ${plan.textInvert ? 'text-white' : 'text-gray-800'}`}>
-                          {f.en}
-                        </span>
-                        <span className={`text-xs block ${plan.textInvert ? 'text-white/60' : 'text-gray-500'}`}>
-                          {f.bn}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href="#footer"
-                  className={`w-full py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors duration-200 ${plan.btnClass}`}
-                >
-                  Invest Now / বিনিয়োগ করুন
-                  <ArrowRight className="w-4 h-4" />
-                </a>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* ROI Calculator */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch mb-20">
@@ -274,8 +230,7 @@ export default function InvestorSection() {
                   step={50000}
                   value={amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0A5C36]"
-                />
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0A5C36]" />
                 <div className="flex justify-between mt-1 text-xs text-gray-500">
                   <span>৳ 50,000</span>
                   <span className="font-extrabold text-[#0A5C36] text-base">
@@ -298,8 +253,7 @@ export default function InvestorSection() {
                         tenure === yr
                           ? 'bg-[#0A5C36] text-white shadow-md'
                           : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]'
-                      }`}
-                    >
+                      }`}>
                       {yr} Yrs
                     </button>
                   ))}
@@ -315,8 +269,7 @@ export default function InvestorSection() {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className={`rounded-xl p-3 text-center ${item.highlight ? 'bg-[#0A5C36] text-white' : 'bg-white border border-gray-200'}`}
-                >
+                  className={`rounded-xl p-3 text-center ${item.highlight ? 'bg-[#0A5C36] text-white' : 'bg-white border border-gray-200'}`}>
                   <p className={`text-lg font-extrabold ${item.highlight ? 'text-white' : 'text-[#0A5C36]'}`}>
                     {item.value}
                   </p>
@@ -338,8 +291,7 @@ export default function InvestorSection() {
               src="/images/investor-bg.png"
               alt="Origin Agro aerial farm view for investors"
               fill
-              className="object-cover"
-            />
+              className="object-cover" />
             <div className="absolute inset-0 bg-[#063D24]/75" />
             <div className="relative z-10 p-8 flex flex-col justify-end h-full">
               <div className="flex items-center gap-2 mb-3">
@@ -387,8 +339,7 @@ export default function InvestorSection() {
                   <div
                     className={`w-16 h-16 rounded-full flex items-center justify-center font-extrabold text-lg shadow-lg shrink-0 ${
                       i === 4 ? 'bg-[#F26522] text-white' : 'bg-[#0A5C36] text-white'
-                    }`}
-                  >
+                    }`}>
                     {step.num}
                   </div>
                   <div>
@@ -402,17 +353,11 @@ export default function InvestorSection() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
-            <a
-              href="#footer"
-              className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-10 py-4 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-base"
-            >
+            <a href="#footer" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-10 py-4 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-base">
               <FileText className="w-5 h-5" />
               Download Prospectus / প্রসপেক্টাস ডাউনলোড করুন
             </a>
-            <a
-              href="#footer"
-              className="border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white font-bold px-10 py-4 rounded-xl flex items-center gap-2 transition-all duration-200 text-base"
-            >
+            <a href="#footer" className="border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white font-bold px-10 py-4 rounded-xl flex items-center gap-2 transition-all duration-200 text-base">
               <Calendar className="w-5 h-5" />
               Book a Consultation / পরামর্শ বুক করুন
             </a>
