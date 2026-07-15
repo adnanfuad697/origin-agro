@@ -66,11 +66,12 @@ interface InvestmentPlan {
   minAmount: number | null
   companySharePct: number | null
   investorSharePct: number | null
+  illustrativeProfitRate: number | null
 }
 
 export default function InvestorSection() {
   const [amount, setAmount] = useState(50000)
-  const [tenure, setTenure] = useState(3)
+  const [selectedPlanKey, setSelectedPlanKey] = useState('')
   const [plans, setPlans] = useState<InvestmentPlan[]>([])
   const [plansLoading, setPlansLoading] = useState(true)
 
@@ -97,18 +98,22 @@ export default function InvestorSection() {
           minAmount: row.min_amount ? Number(row.min_amount) : null,
           companySharePct: row.company_share_pct ? Number(row.company_share_pct) : null,
           investorSharePct: row.investor_share_pct ? Number(row.investor_share_pct) : null,
+          illustrativeProfitRate: row.illustrative_profit_rate ? Number(row.illustrative_profit_rate) : null,
         }))
         setPlans(mapped)
+        if (mapped.length > 0) setSelectedPlanKey(mapped[0].planKey)
       }
       setPlansLoading(false)
     }
     fetchPlans()
   }, [])
 
-  const rate = amount >= 500000 ? 0.19 : amount >= 250000 ? 0.17 : 0.15
-  const annual = Math.round(amount * rate)
-  const total = Math.round(amount * rate * tenure)
-  const totalWithPrincipal = amount + total
+  const selectedPlan = plans.find((p) => p.planKey === selectedPlanKey) || plans[0]
+  const illustrativeRate = selectedPlan?.illustrativeProfitRate ?? 0
+  const investorSharePct = selectedPlan?.investorSharePct ?? 0
+  const estimatedBusinessProfit = Math.round(amount * (illustrativeRate / 100))
+  const estimatedInvestorShare = Math.round(estimatedBusinessProfit * (investorSharePct / 100))
+  const estimatedTotalPayout = amount + estimatedInvestorShare
 
   return (
     <section id="invest" className="py-20 bg-white overflow-hidden">
@@ -242,19 +247,19 @@ export default function InvestorSection() {
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Tenure (Years) / মেয়াদ (বছর)
+                  Choose Plan / প্ল্যান বেছে নিন
                 </label>
-                <div className="flex gap-2">
-                  {[3, 5, 7].map((yr) => (
+                <div className="flex flex-col gap-2">
+                  {plans.map((plan) => (
                     <button
-                      key={yr}
-                      onClick={() => setTenure(yr)}
-                      className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${
-                        tenure === yr
+                      key={plan.planKey}
+                      onClick={() => setSelectedPlanKey(plan.planKey)}
+                      className={`py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ${
+                        selectedPlanKey === plan.planKey
                           ? 'bg-[#0A5C36] text-white shadow-md'
                           : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]'
                       }`}>
-                      {yr} Yrs
+                      {plan.name} — {plan.tenure}
                     </button>
                   ))}
                 </div>
@@ -263,9 +268,9 @@ export default function InvestorSection() {
 
             <div className="mt-6 grid grid-cols-3 gap-3">
               {[
-                { label: 'Annual Profit / বার্ষিক মুনাফা', value: `৳ ${annual.toLocaleString('en-IN')}`, highlight: false },
-                { label: 'Total Profit / মোট মুনাফা', value: `৳ ${total.toLocaleString('en-IN')}`, highlight: true },
-                { label: 'Total Payout / মোট প্রাপ্তি', value: `৳ ${totalWithPrincipal.toLocaleString('en-IN')}`, highlight: false },
+                { label: 'Est. Business Profit / আনুমানিক ব্যবসায়িক মুনাফা', value: `৳ ${estimatedBusinessProfit.toLocaleString('en-IN')}`, highlight: false },
+                { label: 'Your Est. Share / আপনার আনুমানিক অংশ', value: `৳ ${estimatedInvestorShare.toLocaleString('en-IN')}`, highlight: true },
+                { label: 'Est. Total Payout / আনুমানিক মোট প্রাপ্তি', value: `৳ ${estimatedTotalPayout.toLocaleString('en-IN')}`, highlight: false },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -281,7 +286,7 @@ export default function InvestorSection() {
             </div>
 
             <p className="text-xs text-gray-400 mt-4">
-              * Returns are projected estimates based on historical performance. Past returns do not guarantee future results. Shariah board-verified.
+              * This is an illustrative estimate only, based on an assumed business profit scenario — it is NOT a guaranteed or fixed return. Under the Mudarabah agreement, your actual profit share depends entirely on the real business outcome of that cycle, and your capital may reduce in the event of a genuine loss.
             </p>
           </div>
 
