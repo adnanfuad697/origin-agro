@@ -72,6 +72,8 @@ interface InvestmentPlan {
 export default function InvestorSection() {
   const [amount, setAmount] = useState(50000)
   const [selectedPlanKey, setSelectedPlanKey] = useState('')
+  const [chosenPlanKey, setChosenPlanKey] = useState('')
+  const [investMethod, setInvestMethod] = useState<'online' | 'physical' | null>(null)
   const [plans, setPlans] = useState<InvestmentPlan[]>([])
   const [plansLoading, setPlansLoading] = useState(true)
 
@@ -101,7 +103,10 @@ export default function InvestorSection() {
           illustrativeProfitRate: row.illustrative_profit_rate ? Number(row.illustrative_profit_rate) : null,
         }))
         setPlans(mapped)
-        if (mapped.length > 0) setSelectedPlanKey(mapped[0].planKey)
+        if (mapped.length > 0) {
+          setSelectedPlanKey(mapped[0].planKey)
+          setChosenPlanKey(mapped[0].planKey)
+        }
       }
       setPlansLoading(false)
     }
@@ -199,13 +204,58 @@ export default function InvestorSection() {
                     <p className="text-xs text-amber-800 leading-relaxed">This is a profit-and-loss sharing Musharakah partnership, not a fixed deposit. Both Origin Agro and the investor contribute capital, and in the event of a genuine business loss, capital is reduced proportionally between both parties based on their share of investment.</p>
                   </div>
 
-                  <a href="#footer" className="w-full py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors duration-200 bg-[#0A5C36] hover:bg-[#063D24] text-white mt-auto">
-                    Learn More / বিস্তারিত জানুন
+                  <a href="#invest-method" onClick={() => setChosenPlanKey(plan.planKey)} className="w-full py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors duration-200 bg-[#0A5C36] hover:bg-[#063D24] text-white mt-auto">
+                    Choose This Plan / এই প্ল্যান বেছে নিন
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Choose Investment Method */}
+        {!plansLoading && plans.length > 0 && (
+          <div id="invest-method" className="mb-20 scroll-mt-24">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Choose Your Investment Method</h3>
+              <p className="text-[#0A5C36] font-medium text-sm mt-1">আপনার বিনিয়োগ পদ্ধতি বেছে নিন</p>
+              <p className="text-gray-500 text-sm mt-3">
+                Selected Plan: <span className="font-bold text-gray-800">{plans.find((p) => p.planKey === chosenPlanKey)?.name || plans[0]?.name}</span>
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              <button onClick={() => setInvestMethod('online')} className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${investMethod === 'online' ? 'border-[#0A5C36] bg-[#F7F4EE] shadow-md' : 'border-gray-200 bg-white hover:border-[#0A5C36]/40'}`}>
+                <div className="w-12 h-12 bg-[#0A5C36] rounded-xl flex items-center justify-center mb-4">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <h4 className="font-extrabold text-gray-900 text-lg mb-1">Online</h4>
+                <p className="text-gray-500 text-sm mb-3">অনলাইনে আবেদন করুন</p>
+                <p className="text-gray-600 text-sm leading-relaxed">Fill out a secure digital application form now. Best for smaller amounts and quick processing.</p>
+              </button>
+
+              <button onClick={() => setInvestMethod('physical')} className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${investMethod === 'physical' ? 'border-[#0A5C36] bg-[#F7F4EE] shadow-md' : 'border-gray-200 bg-white hover:border-[#0A5C36]/40'}`}>
+                <div className="w-12 h-12 bg-[#F26522] rounded-xl flex items-center justify-center mb-4">
+                  <Calendar className="w-6 h-6 text-white" />
+                </div>
+                <h4 className="font-extrabold text-gray-900 text-lg mb-1">Physical / Office Visit</h4>
+                <p className="text-gray-500 text-sm mb-3">সরাসরি অফিসে আসুন</p>
+                <p className="text-gray-600 text-sm leading-relaxed">Book an appointment to visit our office, meet our team, and sign your agreement in person.</p>
+              </button>
+            </div>
+
+            {investMethod === 'online' && (
+              <div className="max-w-3xl mx-auto mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-center">
+                <p className="text-amber-800 text-sm font-medium">The online application form is being finalized and will appear here shortly. Thank you for your patience!</p>
+              </div>
+            )}
+
+            {investMethod === 'physical' && (
+              <div className="max-w-3xl mx-auto mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-center">
+                <p className="text-amber-800 text-sm font-medium">The appointment booking form is being finalized and will appear here shortly. Thank you for your patience!</p>
+              </div>
+            )}
           </div>
         )}
 
