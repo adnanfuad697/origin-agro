@@ -167,7 +167,7 @@ export default function InvestorSection() {
             {plans.map((plan) => (
               <div key={plan.id} className="relative rounded-2xl border-2 border-[#0A5C36]/20 bg-white overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-xl">
                 <div className="p-7 flex flex-col flex-1">
-                  <p className="text-xs font-bold uppercase tracking-widest mb-1 text-[#F26522]">Mudarabah Plan</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-1 text-[#F26522]">Musharakah Plan</p>
                   <h3 className="text-2xl font-extrabold mb-0.5 text-gray-900">{plan.name}</h3>
                   {plan.nameBn && <p className="text-sm mb-4 text-gray-500">{plan.nameBn}</p>}
 
@@ -196,7 +196,7 @@ export default function InvestorSection() {
 
                   <div className="mb-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl p-3">
                     <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
-                    <p className="text-xs text-amber-800 leading-relaxed">This is a profit-and-loss sharing Mudarabah partnership, not a fixed deposit. Capital may reduce in the event of a genuine business loss.</p>
+                    <p className="text-xs text-amber-800 leading-relaxed">This is a profit-and-loss sharing Musharakah partnership, not a fixed deposit. Both Origin Agro and the investor contribute capital, and in the event of a genuine business loss, capital is reduced proportionally between both parties based on their share of investment.</p>
                   </div>
 
                   <a href="#footer" className="w-full py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors duration-200 bg-[#0A5C36] hover:bg-[#063D24] text-white mt-auto">
@@ -286,7 +286,7 @@ export default function InvestorSection() {
             </div>
 
             <p className="text-xs text-gray-400 mt-4">
-              * This is an illustrative estimate only, based on an assumed business profit scenario — it is NOT a guaranteed or fixed return. Under the Mudarabah agreement, your actual profit share depends entirely on the real business outcome of that cycle, and your capital may reduce in the event of a genuine loss.
+              * This is an illustrative estimate only, based on an assumed business profit scenario — it is NOT a guaranteed or fixed return. Under the Musharakah agreement, your actual profit share depends entirely on the real business outcome of that cycle, and your capital may reduce proportionally in the event of a genuine loss.
             </p>
           </div>
 
