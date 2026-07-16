@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import AppointmentForm from '@/components/appointment-form'
 import {
   TrendingUp,
   ShieldCheck,
@@ -252,9 +253,7 @@ export default function InvestorSection() {
             )}
 
             {investMethod === 'physical' && (
-              <div className="max-w-3xl mx-auto mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-center">
-                <p className="text-amber-800 text-sm font-medium">The appointment booking form is being finalized and will appear here shortly. Thank you for your patience!</p>
-              </div>
+              <AppointmentForm planInterest={chosenPlanKey || plans[0]?.planKey || ''} />
             )}
           </div>
         )}
