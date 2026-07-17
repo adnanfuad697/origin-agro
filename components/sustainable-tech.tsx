@@ -4,30 +4,22 @@ const techFeatures = [
   {
     icon: Wind,
     title: 'Zero Emission Waste',
-    desc: 'Our integrated waste management system ensures zero harmful emissions through bioconversion and composting processes.',
-    stat: '0 kg',
-    statLabel: 'Carbon Waste',
+    desc: 'Our waste management approach is designed around bioconversion and composting processes to minimize harmful emissions.',
   },
   {
     icon: Flame,
     title: 'Biogas Plant',
-    desc: 'Cattle manure and organic waste are converted into clean biogas energy, powering 60% of our farm operations.',
-    stat: '60%',
-    statLabel: 'Self-Powered',
+    desc: 'Cattle manure and organic waste are planned to be converted into clean biogas energy to help power our farm operations.',
   },
   {
     icon: Sun,
     title: 'Solar Panels',
-    desc: '500kW rooftop solar installations across the resort and farm buildings generate clean renewable electricity.',
-    stat: '500kW',
-    statLabel: 'Solar Capacity',
+    desc: 'Rooftop solar installations across the farm buildings are planned to generate clean renewable electricity.',
   },
   {
     icon: Droplets,
     title: 'Rainwater Harvesting',
-    desc: 'Advanced collection and filtration systems capture seasonal rainfall, reducing freshwater dependency by 70%.',
-    stat: '70%',
-    statLabel: 'Water Saved',
+    desc: 'Collection and filtration systems are planned to capture seasonal rainfall and reduce freshwater dependency.',
   },
 ]
 
@@ -41,25 +33,22 @@ export default function SustainableTech() {
             Green Innovation / সবুজ উদ্ভাবন
           </p>
           <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900">
-            Sustainable Technology Showcase
+            Sustainable Technology Approach
           </h2>
-          <p className="text-[#0A5C36] font-semibold text-base mt-1">টেকসই প্রযুক্তির প্রদর্শনী</p>
+          <p className="text-[#0A5C36] font-semibold text-base mt-1">টেকসই প্রযুক্তির পরিকল্পনা</p>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto leading-relaxed">
-            Origin Agro is powered by cutting-edge green technology that minimizes environmental impact
-            while maximizing operational efficiency.
+            Origin Agro is being developed with a commitment to sustainable, environmentally responsible
+            farm technology as the project grows.
           </p>
           <p className="text-gray-400 text-sm mt-1 max-w-xl mx-auto">
-            অরিজিন অ্যাগ্রো অত্যাধুনিক সবুজ প্রযুক্তিতে পরিচালিত যা পরিবেশগত প্রভাব হ্রাস করে।
+            অরিজিন অ্যাগ্রো টেকসই ও পরিবেশবান্ধব প্রযুক্তির প্রতি প্রতিশ্রুতিবদ্ধ।
           </p>
         </div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {techFeatures.map((feature) => (
-            <div
-              key={feature.title}
-              className="relative bg-[#F7F4EE] rounded-2xl p-6 border border-gray-100 hover:border-[#0A5C36]/30 hover:shadow-lg transition-all duration-300 group overflow-hidden"
-            >
+            <div key={feature.title} className="relative bg-[#F7F4EE] rounded-2xl p-6 border border-gray-100 hover:border-[#0A5C36]/30 hover:shadow-lg transition-all duration-300 group overflow-hidden">
               {/* Background accent */}
               <div className="absolute top-0 right-0 w-20 h-20 bg-[#0A5C36]/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-[#0A5C36]/10 transition-colors" />
 
@@ -69,13 +58,7 @@ export default function SustainableTech() {
               </div>
 
               <h3 className="font-extrabold text-gray-900 text-base mb-2">{feature.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed mb-5">{feature.desc}</p>
-
-              {/* Stat */}
-              <div className="border-t border-gray-200 pt-4">
-                <p className="text-2xl font-extrabold text-[#0A5C36]">{feature.stat}</p>
-                <p className="text-xs text-gray-500 font-medium">{feature.statLabel}</p>
-              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -84,11 +67,10 @@ export default function SustainableTech() {
         <div className="mt-12 bg-[#F7F4EE] rounded-2xl p-6 md:p-8 border border-[#0A5C36]/10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-lg font-extrabold text-gray-900">
-              Certified by{' '}
-              <span className="text-[#0A5C36]">Bangladesh Green Building Council</span>
+              Committed to <span className="text-[#0A5C36]">Sustainable Farm Practices</span>
             </p>
             <p className="text-gray-500 text-sm mt-1">
-              Our eco-resort meets the highest international standards for sustainable construction and operations.
+              Our long-term goal is to meet recognized standards for sustainable, environmentally responsible operations as the farm develops.
             </p>
           </div>
           <div className="flex items-center gap-4 shrink-0">
