@@ -136,20 +136,20 @@ export default function InvestorSection() {
             <span className="text-[#0A5C36]">Earn Halal.</span>
           </h2>
           <p className="text-gray-500 text-base max-w-2xl mx-auto leading-relaxed">
-            Join 500+ investors in Bangladesh&apos;s most transparent Shariah-compliant agro-investment platform.
+            Join Bangladesh's transparent, Shariah-guided agro-investment partnership model.
           </p>
           <p className="text-[#0A5C36] text-sm mt-1 font-medium">
-            বাংলাদেশের সবচেয়ে স্বচ্ছ শরিয়াহ-সম্মত কৃষি বিনিয়োগ প্ল্যাটফর্মে ৫০০+ বিনিয়োগকারীর সাথে যোগ দিন।
+            বাংলাদেশের একটি স্বচ্ছ, শরিয়াহ-নির্দেশিত কৃষি বিনিয়োগ পার্টনারশিপ মডেলে যোগ দিন।
           </p>
         </div>
 
         {/* Trust Badges Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {[
-            { icon: ShieldCheck, en: 'Shariah Certified', bn: 'শরিয়াহ সনদপ্রাপ্ত', val: '100%' },
-            { icon: Users, en: 'Active Investors', bn: 'সক্রিয় বিনিয়োগকারী', val: '500+' },
-            { icon: TrendingUp, en: 'Annual Returns', bn: 'বার্ষিক রিটার্ন', val: '15–19%' },
-            { icon: BadgeCheck, en: 'Govt. Registered', bn: 'সরকারি নিবন্ধিত', val: 'RJSC' },
+            { icon: ShieldCheck, en: 'Shariah-Guided Model', bn: 'শরিয়াহ-নির্দেশিত মডেল', val: 'Musharakah' },
+            { icon: Users, en: 'Investment Model', bn: 'বিনিয়োগ মডেল', val: 'Partnership' },
+            { icon: TrendingUp, en: 'Profit Structure', bn: 'মুনাফা কাঠামো', val: 'Profit & Loss Share' },
+            { icon: BadgeCheck, en: 'Transparent Terms', bn: 'স্বচ্ছ শর্তাবলী', val: '100%' },
           ].map(({ icon: Icon, en, bn, val }) => (
             <div key={en} className="bg-[#F7F4EE] rounded-2xl p-5 flex flex-col items-center text-center gap-2 border border-gray-100 hover:border-[#0A5C36]/30 hover:shadow-md transition-all duration-200">
               <div className="w-11 h-11 bg-[#0A5C36] rounded-xl flex items-center justify-center">
