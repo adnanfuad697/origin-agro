@@ -13,9 +13,9 @@ const notoSerifBengali = Noto_Serif_Bengali({
 })
 
 export const metadata: Metadata = {
-  title: 'Origin Agro — অরিজিন অ্যাগ্রো | Integrated Agro Farm & Eco Resort',
+  title: 'Origin Agro — অরিজিন অ্যাগ্রো | Integrated Agro Farm & Musharakah Investment',
   description:
-    'Origin Agro | অরিজিন অ্যাগ্রো — Bangladesh\'s premier Shariah-compliant integrated agro-tourism and livestock platform. Smart investment, eco resort, organic agriculture & certified cattle farm. বাংলাদেশের শীর্ষ হালাল কৃষি বিনিয়োগ প্ল্যাটফর্ম।',
+    'Origin Agro | অরিজিন অ্যাগ্রো — Bangladesh\'s Shariah-guided integrated agro-investment platform. Musharakah partnership investment, organic agriculture & livestock farming. বাংলাদেশের শরিয়াহ-নির্দেশিত কৃষি বিনিয়োগ প্ল্যাটফর্ম।',
   generator: 'v0.app',
 }
 
