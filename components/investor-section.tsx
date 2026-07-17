@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import AppointmentForm from '@/components/appointment-form'
+import KycForm from '@/components/kyc-form'
 import {
   TrendingUp,
   ShieldCheck,
@@ -247,9 +248,7 @@ export default function InvestorSection() {
             </div>
 
             {investMethod === 'online' && (
-              <div className="max-w-3xl mx-auto mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-center">
-                <p className="text-amber-800 text-sm font-medium">The online application form is being finalized and will appear here shortly. Thank you for your patience!</p>
-              </div>
+              <KycForm planKey={chosenPlanKey || plans[0]?.planKey || ''} />
             )}
 
             {investMethod === 'physical' && (
