@@ -1,4 +1,5 @@
 import { Phone, Mail, MapPin, Leaf } from 'lucide-react'
+import ContactForm from '@/components/contact-form'
 
 // Inline SVG social icon (lucide-react v1+ removed social icons)
 function FacebookIcon() {
@@ -138,10 +139,15 @@ export default function MegaFooter() {
         </div>
       </div>
 
+      {/* Contact Form */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
+        <ContactForm />
+      </div>
+
       {/* Bottom Bar */}
       <div className="border-t border-white/10 py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-white/50">
-          <p>© 2026 Origin Agro Ltd. All rights reserved. / সর্বস্বত্ব সংরক্ষিত।</p>
+          <p>© 2026 Origin Agro. All rights reserved. / সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex gap-5">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
