@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X, Leaf } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X, Globe } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 
 const navLinks = [
@@ -16,15 +17,15 @@ const navLinks = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { lang } = useLanguage()
+  const { lang, setLang } = useLanguage()
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <a href="#" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 bg-[#0A5C36] rounded-lg flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-white" />
+            <div className="relative w-10 h-10 shrink-0">
+              <Image src="/images/logo.png" alt="Origin Agro Logo" fill className="object-contain" />
             </div>
             <span className="text-[#0A5C36] font-extrabold text-xl tracking-tight">
               Origin <span className="text-[#F26522]">Agro</span>
@@ -41,7 +42,14 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
+            <button 
+              onClick={() => setLang(lang === 'EN' ? 'BN' : 'EN')}
+              className="flex items-center gap-1.5 text-xs font-bold text-[#0A5C36] hover:text-[#F26522] transition-colors"
+            >
+              <Globe className="w-4 h-4" />
+              {lang}
+            </button>
             <a href="#invest" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-5 py-2.5 rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg flex flex-col items-center leading-tight">
               <span>{lang === 'EN' ? 'Invest Now' : 'বিনিয়োগ করুন'}</span>
               <span className="text-[10px] font-normal opacity-80">{lang === 'EN' ? 'বিনিয়োগ করুন' : 'Invest Now'}</span>
@@ -63,8 +71,14 @@ export default function Navbar() {
                 <span className="text-xs text-gray-400">{lang === 'EN' ? link.labelBn : link.label}</span>
               </a>
             ))}
-            <a href="#projects" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-5 py-2.5 rounded-lg text-center mt-2 transition-colors" onClick={() => setMobileOpen(false)}>
-              {lang === 'EN' ? 'Book Now' : 'বুক করুন'}
+            <button 
+              onClick={() => setLang(lang === 'EN' ? 'BN' : 'EN')}
+              className="py-2 text-sm font-bold text-[#0A5C36] border-b border-gray-50 text-left"
+            >
+              {lang === 'EN' ? 'Switch to Bangla' : 'English এ পরিবর্তন করুন'}
+            </button>
+            <a href="#invest" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-5 py-2.5 rounded-lg text-center mt-2 transition-colors" onClick={() => setMobileOpen(false)}>
+              {lang === 'EN' ? 'Invest Now' : 'বিনিয়োগ করুন'}
             </a>
           </div>
         </div>
