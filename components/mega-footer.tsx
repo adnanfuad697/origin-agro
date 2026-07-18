@@ -1,4 +1,5 @@
-import { Phone, Mail, MapPin, Leaf } from 'lucide-react'
+import Image from 'next/image'
+import { Phone, Mail, MapPin } from 'lucide-react'
 import ContactForm from '@/components/contact-form'
 
 // Inline SVG social icon (lucide-react v1+ removed social icons)
@@ -11,12 +12,12 @@ function FacebookIcon() {
 }
 
 const quickLinks = [
-  { en: 'Home', bn: 'হোম', href: '#' },
-  { en: 'About Us', bn: 'আমাদের সম্পর্কে', href: '#team' },
-  { en: 'Our Projects', bn: 'আমাদের প্রকল্প', href: '#projects' },
-  { en: 'Smart Invest', bn: 'বিনিয়োগ', href: '#invest' },
-  { en: 'Shop', bn: 'শপ', href: '#shop' },
-  { en: 'FAQ', bn: 'প্রশ্নোত্তর', href: '#faq' },
+  { en: 'Home', bn: 'হোম', href: '/' },
+  { en: 'About Us', bn: 'আমাদের সম্পর্কে', href: '/#team' },
+  { en: 'Our Projects', bn: 'আমাদের প্রকল্প', href: '/#projects' },
+  { en: 'Smart Invest', bn: 'বিনিয়োগ', href: '/#invest' },
+  { en: 'Shop', bn: 'শপ', href: '/#shop' },
+  { en: 'FAQ', bn: 'প্রশ্নোত্তর', href: '/#faq' },
 ]
 const services = [
   { en: 'Agro Investment', bn: 'কৃষি বিনিয়োগ' },
@@ -46,9 +47,9 @@ export default function MegaFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Column 1: Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-[#F26522]" />
+            <div className="flex items-center gap-3 mb-5">
+              <div className="relative w-11 h-11 shrink-0">
+                <Image src="/images/logo.png" alt="Origin Agro Logo" fill className="object-contain" />
               </div>
               <span className="text-xl font-extrabold tracking-tight">
                 Origin <span className="text-[#F26522]">Agro</span>
@@ -90,7 +91,7 @@ export default function MegaFooter() {
             <ul className="space-y-2.5">
               {services.map((service) => (
                 <li key={service.en}>
-                  <a href="#" className="text-white/70 hover:text-[#F26522] text-sm transition-colors flex items-center gap-2 group">
+                  <a href="/#shop" className="text-white/70 hover:text-[#F26522] text-sm transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 bg-[#F26522] rounded-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <span>{service.en}</span>
                     <span className="text-white/40 text-xs ml-auto">{service.bn}</span>
@@ -147,7 +148,7 @@ export default function MegaFooter() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10 py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-white/50">
-          <p>© 2026 Origin Agro. All rights reserved. / সর্বস্বত্ব সংরক্ষিত।</p>
+          <p>© 2026 Origin Agro Ltd. All rights reserved. / সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex gap-5">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
