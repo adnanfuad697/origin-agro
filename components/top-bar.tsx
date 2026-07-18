@@ -25,7 +25,7 @@ export default function TopBar() {
             <Globe className="w-3.5 h-3.5" />
             <span className="font-semibold">{lang}</span>
           </button>
-          <a href="#" className="flex items-center gap-1 hover:text-[#F26522] transition-colors">
+          <a href="/account" className="flex items-center gap-1 hover:text-[#F26522] transition-colors">
             <User className="w-3.5 h-3.5" />
             <span>{lang === 'EN' ? 'My Account' : 'আমার অ্যাকাউন্ট'}</span>
           </a>
