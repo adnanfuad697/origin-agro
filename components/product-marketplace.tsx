@@ -139,7 +139,8 @@ export default function ProductMarketplace() {
             {filtered.map((product) => (
               <div
                 key={product.id}
-                className="bg-white rounded-2xl p-4 shadow-sm border flex flex-col hover:shadow-md transition-shadow"
+                onClick={() => window.location.href = `/product/${product.id}`}
+                className="bg-white rounded-2xl p-4 shadow-sm border flex flex-col hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="relative h-40 mb-3 overflow-hidden rounded-lg bg-gray-100">
                   <Image
