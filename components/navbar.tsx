@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ShoppingCart } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 
 const navLinks = [
@@ -18,6 +18,22 @@ const navLinks = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { lang } = useLanguage()
+  const [cartCount, setCartCount] = useState(0)
+
+  useEffect(() => {
+    function updateCartCount() {
+      const cart = JSON.parse(window.localStorage.getItem('origin-agro-cart') || '[]')
+      const count = cart.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      setCartCount(count)
+    }
+    updateCartCount()
+    window.addEventListener('storage', updateCartCount)
+    const interval = setInterval(updateCartCount, 1000)
+    return () => {
+      window.removeEventListener('storage', updateCartCount)
+      clearInterval(interval)
+    }
+  }, [])
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -41,15 +57,33 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center">
+          <div className="hidden lg:flex items-center gap-3">
+            <a href="/cart" className="relative w-11 h-11 flex items-center justify-center rounded-xl border-2 border-gray-200 hover:border-[#0A5C36] transition-colors">
+              <ShoppingCart className="w-5 h-5 text-gray-700" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#F26522] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </a>
             <a href="/#invest" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 text-sm shadow-md hover:shadow-lg">
               {lang === 'EN' ? 'Invest Now' : 'বিনিয়োগ করুন'}
             </a>
           </div>
 
-          <button className="lg:hidden text-gray-700 hover:text-[#0A5C36]" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
-            {mobileOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <a href="/cart" className="relative w-10 h-10 flex items-center justify-center">
+              <ShoppingCart className="w-6 h-6 text-gray-700" />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 w-4 h-4 bg-[#F26522] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </a>
+            <button className="text-gray-700 hover:text-[#0A5C36]" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
+              {mobileOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            </button>
+          </div>
         </div>
       </div>
 
