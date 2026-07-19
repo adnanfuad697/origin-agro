@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
+import AddressFields from '@/components/address-fields'
 import { Star, Truck, ShoppingCart, Zap, ArrowLeft, User } from 'lucide-react'
 
 interface Product {
@@ -66,8 +67,12 @@ export default function ProductDetailPage() {
 
   // Buy Now form
   const [showBuyForm, setShowBuyForm] = useState(false)
-  const [deliveryAddress, setDeliveryAddress] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
+  const [division, setDivision] = useState('')
+  const [district, setDistrict] = useState('')
+  const [upazila, setUpazila] = useState('')
+  const [villageOrArea, setVillageOrArea] = useState('')
+  const [googleMapsLink, setGoogleMapsLink] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery')
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderMsg, setOrderMsg] = useState('')
@@ -171,14 +176,38 @@ export default function ProductDetailPage() {
       router.push('/account')
       return
     }
+
+    // Auto-fill address from their saved profile, if they have one
+    const { data: profile } = await supabase
+      .from('customer_profiles')
+      .select('mobile_number, division, district, upazila, village_or_area, google_maps_link')
+      .eq('id', session.user.id)
+      .single()
+
+    if (profile) {
+      if (profile.mobile_number) setMobileNumber(profile.mobile_number)
+      if (profile.division) setDivision(profile.division)
+      if (profile.district) setDistrict(profile.district)
+      if (profile.upazila) setUpazila(profile.upazila)
+      if (profile.village_or_area) setVillageOrArea(profile.village_or_area)
+      if (profile.google_maps_link) setGoogleMapsLink(profile.google_maps_link)
+    }
+
     setShowBuyForm(true)
   }
 
   async function handlePlaceOrder(e: React.FormEvent) {
     e.preventDefault()
     setOrderMsg('')
-    if (!deliveryAddress || !mobileNumber) {
-      setOrderMsg('Please fill in your delivery address and mobile number.')
+
+    const hasMapsLink = googleMapsLink.trim().length > 0
+
+    if (!mobileNumber) {
+      setOrderMsg('Please enter your mobile number.')
+      return
+    }
+    if (!hasMapsLink && (!division || !district || !upazila)) {
+      setOrderMsg('Please provide a Google Maps link, or fill in Division, District, and Upazila.')
       return
     }
     if (!product) return
@@ -191,6 +220,10 @@ export default function ProductDetailPage() {
       return
     }
 
+    const addressSummary = hasMapsLink
+      ? googleMapsLink
+      : `${villageOrArea ? villageOrArea + ', ' : ''}${upazila}, ${district}, ${division}`
+
     const { error } = await supabase.from('orders').insert([{
       user_id: session.user.id,
       product_id: product.id,
@@ -199,11 +232,28 @@ export default function ProductDetailPage() {
       unit_price: product.price,
       quantity,
       total_price: product.price * quantity,
-      delivery_address: deliveryAddress,
+      delivery_address: addressSummary,
       mobile_number: mobileNumber,
       payment_method: paymentMethod,
       status: 'pending',
+      division: division || null,
+      district: district || null,
+      upazila: upazila || null,
+      village_or_area: villageOrArea || null,
+      google_maps_link: googleMapsLink || null,
     }])
+
+    if (!error) {
+      await supabase.from('customer_profiles').update({
+        mobile_number: mobileNumber,
+        division: division || null,
+        district: district || null,
+        upazila: upazila || null,
+        village_or_area: villageOrArea || null,
+        google_maps_link: googleMapsLink || null,
+      }).eq('id', session.user.id)
+    }
+
     setPlacingOrder(false)
 
     if (error) {
@@ -323,8 +373,15 @@ export default function ProductDetailPage() {
               {showBuyForm && !orderPlaced && (
                 <form onSubmit={handlePlaceOrder} className="mt-6 bg-[#F7F4EE] rounded-xl p-5 space-y-3">
                   <p className="font-bold text-gray-900 text-sm">Complete Your Order</p>
-                  <input type="text" value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} placeholder="Delivery Address *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
                   <input type="tel" value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} placeholder="Mobile Number *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
+
+                  <AddressFields
+                    division={division} setDivision={setDivision}
+                    district={district} setDistrict={setDistrict}
+                    upazila={upazila} setUpazila={setUpazila}
+                    villageOrArea={villageOrArea} setVillageOrArea={setVillageOrArea}
+                    googleMapsLink={googleMapsLink} setGoogleMapsLink={setGoogleMapsLink} />
+
                   <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white">
                     <option value="cash_on_delivery">Cash on Delivery</option>
                     <option value="bkash">bKash (pay on confirmation)</option>
