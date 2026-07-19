@@ -65,24 +65,20 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName,
+          mobile_number: mobileNumber || null,
+        },
+      },
     })
 
+    setSubmitting(false)
+
     if (error) {
-      setSubmitting(false)
       setErrorMsg(error.message)
       return
     }
-
-    // Create the matching profile row, if the user session is available immediately
-    if (data.user) {
-      await supabase.from('customer_profiles').insert([{
-        id: data.user.id,
-        full_name: fullName,
-        mobile_number: mobileNumber || null,
-      }])
-    }
-
-    setSubmitting(false)
 
     if (data.session) {
       // Signed in immediately (email confirmation disabled)
