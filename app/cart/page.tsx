@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
+import AddressFields from '@/components/address-fields'
 import { Trash2, ShoppingBag, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
 interface CartItem {
@@ -27,8 +28,12 @@ export default function CartPage() {
   const [loaded, setLoaded] = useState(false)
 
   const [showCheckout, setShowCheckout] = useState(false)
-  const [deliveryAddress, setDeliveryAddress] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
+  const [division, setDivision] = useState('')
+  const [district, setDistrict] = useState('')
+  const [upazila, setUpazila] = useState('')
+  const [villageOrArea, setVillageOrArea] = useState('')
+  const [googleMapsLink, setGoogleMapsLink] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery')
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderMsg, setOrderMsg] = useState('')
@@ -65,14 +70,38 @@ export default function CartPage() {
       router.push('/account')
       return
     }
+
+    // Auto-fill address from their saved profile, if they have one
+    const { data: profile } = await supabase
+      .from('customer_profiles')
+      .select('mobile_number, division, district, upazila, village_or_area, google_maps_link')
+      .eq('id', session.user.id)
+      .single()
+
+    if (profile) {
+      if (profile.mobile_number) setMobileNumber(profile.mobile_number)
+      if (profile.division) setDivision(profile.division)
+      if (profile.district) setDistrict(profile.district)
+      if (profile.upazila) setUpazila(profile.upazila)
+      if (profile.village_or_area) setVillageOrArea(profile.village_or_area)
+      if (profile.google_maps_link) setGoogleMapsLink(profile.google_maps_link)
+    }
+
     setShowCheckout(true)
   }
 
   async function handlePlaceOrder(e: React.FormEvent) {
     e.preventDefault()
     setOrderMsg('')
-    if (!deliveryAddress || !mobileNumber) {
-      setOrderMsg('Please fill in your delivery address and mobile number.')
+
+    const hasMapsLink = googleMapsLink.trim().length > 0
+
+    if (!mobileNumber) {
+      setOrderMsg('Please enter your mobile number.')
+      return
+    }
+    if (!hasMapsLink && (!division || !district || !upazila)) {
+      setOrderMsg('Please provide a Google Maps link, or fill in Division, District, and Upazila.')
       return
     }
 
@@ -84,7 +113,10 @@ export default function CartPage() {
       return
     }
 
-    // Insert one order row per cart item (keeps the orders table structure simple and consistent)
+    const addressSummary = hasMapsLink
+      ? googleMapsLink
+      : `${villageOrArea ? villageOrArea + ', ' : ''}${upazila}, ${district}, ${division}`
+
     const rows = cart.map((item) => ({
       user_id: session.user.id,
       product_id: item.productId,
@@ -93,13 +125,31 @@ export default function CartPage() {
       unit_price: item.price,
       quantity: item.quantity,
       total_price: item.price * item.quantity,
-      delivery_address: deliveryAddress,
+      delivery_address: addressSummary,
       mobile_number: mobileNumber,
       payment_method: paymentMethod,
       status: 'pending',
+      division: division || null,
+      district: district || null,
+      upazila: upazila || null,
+      village_or_area: villageOrArea || null,
+      google_maps_link: googleMapsLink || null,
     }))
 
     const { error } = await supabase.from('orders').insert(rows)
+
+    if (!error) {
+      // Save this address to their profile for next time
+      await supabase.from('customer_profiles').update({
+        mobile_number: mobileNumber,
+        division: division || null,
+        district: district || null,
+        upazila: upazila || null,
+        village_or_area: villageOrArea || null,
+        google_maps_link: googleMapsLink || null,
+      }).eq('id', session.user.id)
+    }
+
     setPlacingOrder(false)
 
     if (error) {
@@ -192,8 +242,15 @@ export default function CartPage() {
 
                 {showCheckout && (
                   <form onSubmit={handlePlaceOrder} className="space-y-3 mt-2">
-                    <input type="text" value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} placeholder="Delivery Address *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
                     <input type="tel" value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} placeholder="Mobile Number *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
+
+                    <AddressFields
+                      division={division} setDivision={setDivision}
+                      district={district} setDistrict={setDistrict}
+                      upazila={upazila} setUpazila={setUpazila}
+                      villageOrArea={villageOrArea} setVillageOrArea={setVillageOrArea}
+                      googleMapsLink={googleMapsLink} setGoogleMapsLink={setGoogleMapsLink} />
+
                     <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white">
                       <option value="cash_on_delivery">Cash on Delivery</option>
                       <option value="bkash">bKash (pay on confirmation)</option>
