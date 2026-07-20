@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import AuthForm from '@/components/auth-form'
 import OrderHistory from '@/components/order-history'
+import MessagesPanel from '@/components/messages-panel'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
@@ -128,11 +129,16 @@ export default function AccountPage() {
               </div>
 
               <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                <div className="w-10 h-10 bg-[#F26522]/10 rounded-xl flex items-center justify-center mb-3">
-                  <MessageSquare className="w-5 h-5 text-[#F26522]" />
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 bg-[#F26522]/10 rounded-xl flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-[#F26522]" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900">Messages</h3>
+                    <p className="text-gray-500 text-xs">বার্তা</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">Messages</h3>
-                <p className="text-gray-500 text-sm">Your conversation with our team will appear here soon.</p>
+                <MessagesPanel />
               </div>
             </div>
           )}
