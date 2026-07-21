@@ -16,6 +16,8 @@ export default function KycForm({ planKey }: KycFormProps) {
   const [fatherOrSpouseName, setFatherOrSpouseName] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
   const [nidNumber, setNidNumber] = useState('')
+  const [nidFrontFile, setNidFrontFile] = useState<File | null>(null)
+  const [nidBackFile, setNidBackFile] = useState<File | null>(null)
   const [mobileNumber, setMobileNumber] = useState('')
   const [email, setEmail] = useState('')
   const [presentAddress, setPresentAddress] = useState('')
@@ -100,6 +102,23 @@ export default function KycForm({ planKey }: KycFormProps) {
 
     setSubmitting(true)
 
+    let nidFrontUrl: string | null = null
+    let nidBackUrl: string | null = null
+
+    if (nidFrontFile) {
+      const ext = nidFrontFile.name.split('.').pop()
+      const path = `${Date.now()}-${nidNumber || 'unknown'}-front.${ext}`
+      const { error: uploadError } = await supabase.storage.from('nid-documents').upload(path, nidFrontFile)
+      if (!uploadError) nidFrontUrl = path
+    }
+
+    if (nidBackFile) {
+      const ext = nidBackFile.name.split('.').pop()
+      const path = `${Date.now()}-${nidNumber || 'unknown'}-back.${ext}`
+      const { error: uploadError } = await supabase.storage.from('nid-documents').upload(path, nidBackFile)
+      if (!uploadError) nidBackUrl = path
+    }
+
     const { error } = await supabase.from('investment_applications').insert([{
       method: 'online',
       plan_key: planKey,
@@ -107,6 +126,8 @@ export default function KycForm({ planKey }: KycFormProps) {
       father_or_spouse_name: fatherOrSpouseName,
       date_of_birth: dateOfBirth,
       nid_number: nidNumber,
+      nid_front_url: nidFrontUrl,
+      nid_back_url: nidBackUrl,
       mobile_number: mobileNumber,
       email: email || null,
       present_address: presentAddress,
@@ -199,6 +220,19 @@ export default function KycForm({ planKey }: KycFormProps) {
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1.5">NID Number *</label>
                 <input type="text" value={nidNumber} onChange={(e) => setNidNumber(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">NID Photo — Front Side</label>
+                <input type="file" accept="image/*" onChange={(e) => setNidFrontFile(e.target.files?.[0] || null)} className="w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#0A5C36] file:text-white file:text-xs file:font-bold" />
+                {nidFrontFile && <p className="text-xs text-[#0A5C36] mt-1">✓ {nidFrontFile.name}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">NID Photo — Back Side</label>
+                <input type="file" accept="image/*" onChange={(e) => setNidBackFile(e.target.files?.[0] || null)} className="w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#0A5C36] file:text-white file:text-xs file:font-bold" />
+                {nidBackFile && <p className="text-xs text-[#0A5C36] mt-1">✓ {nidBackFile.name}</p>}
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
