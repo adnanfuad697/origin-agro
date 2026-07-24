@@ -7,9 +7,9 @@ import { useLanguage } from '@/contexts/language-context'
 
 const navLinks = [
   { label: 'Home', labelBn: 'হোম', href: '/' },
-  { label: 'Projects', labelBn: 'প্রকল্প', href: '/#projects' },
-  { label: 'Invest', labelBn: 'বিনিয়োগ', href: '/#invest' },
   { label: 'Shop', labelBn: 'শপ', href: '/#shop' },
+  { label: 'Invest', labelBn: 'বিনিয়োগ', href: '/#invest' },
+  { label: 'Projects', labelBn: 'প্রকল্প', href: '/#projects' },
   { label: 'About', labelBn: 'আমাদের', href: '/#team' },
   { label: 'FAQ', labelBn: 'প্রশ্নোত্তর', href: '/#faq' },
   { label: 'Contact', labelBn: 'যোগাযোগ', href: '/#footer' },
