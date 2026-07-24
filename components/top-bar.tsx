@@ -1,6 +1,6 @@
 'use client'
 
-import { Phone, Mail, Globe, User } from 'lucide-react'
+import { Phone, Mail, Globe, CircleUserRound } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 
 export default function TopBar() {
@@ -27,7 +27,7 @@ export default function TopBar() {
           </button>
           <a href="/account" className="flex items-center gap-1 hover:text-[#F26522] transition-colors">
             <User className="w-3.5 h-3.5" />
-            <span>{lang === 'EN' ? 'My Account' : 'আমার অ্যাকাউন্ট'}</span>
+            <span>{lang === 'EN' ? 'Login/Account' : 'লগইন/অ্যাকাউন্ট'}</span>
           </a>
           <a href="/?category=Qurbani+Cattle#shop" className="bg-[#F26522] hover:bg-[#d4551a] text-white font-semibold px-3 py-1 rounded transition-colors text-xs whitespace-nowrap">
             {lang === 'EN' ? '🐄 Buy Cattle' : '🐄 কোরবানির পশু'}
