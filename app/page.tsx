@@ -8,17 +8,16 @@ import InvestorSection from '@/components/investor-section'
 import ProductMarketplace from '@/components/product-marketplace'
 import FaqSection from '@/components/faq-section'
 import MegaFooter from '@/components/mega-footer'
-
 export default function HomePage() {
   return (
     <main>
       <TopBar />
       <Navbar />
       <HeroSection />
-      <ProjectOverview />
-      <InvestorSection />
-      <SustainableTech />
       <ProductMarketplace />
+      <InvestorSection />
+      <ProjectOverview />
+      <SustainableTech />
       <ExecutiveTeam />
       <FaqSection />
       <MegaFooter />
