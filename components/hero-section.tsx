@@ -91,11 +91,7 @@ export default function HeroSection() {
           <div className="relative order-1 lg:order-2">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
               <Image src="/images/hero-masterplan.png" alt="Origin Agro 3D agro-village master plan aerial view" fill className="object-cover" priority />
-              {/* Overlay badge */}
-              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur rounded-xl px-4 py-2.5 shadow-lg">
-                <p className="text-xs text-gray-500">{lang === 'EN' ? 'Master Plan Visualization' : 'মাস্টার প্ল্যান'}</p>
-                <p className="text-sm font-bold text-[#0A5C36]">{lang === 'EN' ? 'Origin Agro Village — Phase 1' : 'অরিজিন অ্যাগ্রো ভিলেজ — ফেজ ১'}</p>
-              </div>
+              
             </div>
 
             {/* Decorative elements */}
