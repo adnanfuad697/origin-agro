@@ -27,6 +27,30 @@ interface Product {
   inStock: boolean
 }
 
+interface ProductMarketplaceProps {
+  lang?: 'en' | 'bn'
+}
+
+// Translation dictionary for category names
+const categoryTranslations: Record<string, string> = {
+  all: 'সব পণ্য',
+  vegetables: 'শাকসবজি',
+  fruits: 'ফলমূল',
+  dairy: 'ডেয়ারি',
+  meat: 'মাংস',
+  fish: 'মাছ',
+  spices: 'মশলা',
+  grains: 'শস্যদানা',
+  groceries: 'মুদি সামগ্রী',
+}
+
+function getCategoryName(category: string, lang: 'en' | 'bn') {
+  if (lang === 'en') {
+    return category === 'all' ? 'All Products' : category
+  }
+  return categoryTranslations[category.toLowerCase()] || category
+}
+
 function formatTaka(amount: number) {
   return `৳ ${amount.toLocaleString('en-IN')}`
 }
@@ -44,8 +68,7 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-export default function ProductMarketplace() {
-  const [lang, setLang] = useState<'en' | 'bn'>('en')
+export default function ProductMarketplace({ lang = 'en' }: ProductMarketplaceProps) {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -102,33 +125,13 @@ export default function ProductMarketplace() {
     <section id="shop" className="py-20 bg-[#F7F4EE]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Language Toggle Controls */}
-        <div className="flex justify-end mb-4">
-          <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
-            <button
-              onClick={() => setLang('en')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${
-                lang === 'en' ? 'bg-[#0A5C36] text-white' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => setLang('bn')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${
-                lang === 'bn' ? 'bg-[#0A5C36] text-white' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              BN
-            </button>
-          </div>
-        </div>
-
         <div className="text-center mb-12">
           <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
-            Origin Agro Marketplace
+            {lang === 'bn' ? 'অরিজিন এগ্রো মার্কেটপ্লেস' : 'Origin Agro Marketplace'}
           </p>
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-3">Shop Directly From the Farm</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-3">
+            {lang === 'bn' ? 'সরাসরি খামার থেকে কিনুন' : 'Shop Directly From the Farm'}
+          </h2>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
@@ -144,18 +147,24 @@ export default function ProductMarketplace() {
                     : 'bg-white border text-gray-700 hover:border-[#0A5C36]'
                 }`}
               >
-                {cat === 'all' ? (lang === 'bn' ? 'সব পণ্য' : 'All Products') : cat} {count}
+                {getCategoryName(cat, lang)} ({count})
               </button>
             )
           })}
         </div>
 
-        {loading && <div className="text-center py-20 text-gray-500">Loading products...</div>}
+        {loading && (
+          <div className="text-center py-20 text-gray-500">
+            {lang === 'bn' ? 'পণ্য লোড হচ্ছে...' : 'Loading products...'}
+          </div>
+        )}
 
         {!loading && errorMsg && <div className="text-center py-20 text-red-500">{errorMsg}</div>}
 
         {!loading && !errorMsg && filtered.length === 0 && (
-          <div className="text-center py-20 text-gray-500">No products in this category yet.</div>
+          <div className="text-center py-20 text-gray-500">
+            {lang === 'bn' ? 'এই বিভাগে কোনো পণ্য পাওয়া যায়নি।' : 'No products in this category yet.'}
+          </div>
         )}
 
         {!loading && !errorMsg && filtered.length > 0 && (
@@ -187,7 +196,7 @@ export default function ProductMarketplace() {
                     )}
                     {!product.inStock && (
                       <span className="absolute top-2 right-2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded-full">
-                        Out of Stock
+                        {lang === 'bn' ? 'স্টক শেষ' : 'Out of Stock'}
                       </span>
                     )}
                   </div>
