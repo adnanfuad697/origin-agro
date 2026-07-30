@@ -27,10 +27,6 @@ interface Product {
   inStock: boolean
 }
 
-interface ProductMarketplaceProps {
-  lang?: 'en' | 'bn'
-}
-
 // Translation dictionary for category names
 const categoryTranslations: Record<string, string> = {
   all: 'সব পণ্য',
@@ -68,11 +64,36 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-export default function ProductMarketplace({ lang = 'en' }: ProductMarketplaceProps) {
+export default function ProductMarketplace() {
+  const [lang, setLang] = useState<'en' | 'bn'>('en')
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  // Sync language with topbar toggle events and localStorage
+  useEffect(() => {
+    const savedLang = localStorage.getItem('app_lang') as 'en' | 'bn'
+    if (savedLang) setLang(savedLang)
+
+    const handleLangChange = (e: Event) => {
+      const customEvent = e as CustomEvent<'en' | 'bn'>
+      if (customEvent.detail) {
+        setLang(customEvent.detail)
+      } else {
+        const updatedLang = localStorage.getItem('app_lang') as 'en' | 'bn'
+        if (updatedLang) setLang(updatedLang)
+      }
+    }
+
+    window.addEventListener('langChange', handleLangChange)
+    window.addEventListener('storage', handleLangChange)
+
+    return () => {
+      window.removeEventListener('langChange', handleLangChange)
+      window.removeEventListener('storage', handleLangChange)
+    }
+  }, [])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -222,7 +243,7 @@ export default function ProductMarketplace({ lang = 'en' }: ProductMarketplacePr
                   )}
 
                   {displayDescription && (
-                    <p className="text-xs text-gray-500 mb-2 line-clamp-2">{displayDescription}</p>
+                    <p className="text-xs text-[#555555] mb-2 line-clamp-2">{displayDescription}</p>
                   )}
 
                   {displayDelivery && (
