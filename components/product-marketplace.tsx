@@ -45,6 +45,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function ProductMarketplace() {
+  const [lang, setLang] = useState<'en' | 'bn'>('en')
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -100,6 +101,29 @@ export default function ProductMarketplace() {
   return (
     <section id="shop" className="py-20 bg-[#F7F4EE]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Language Toggle Controls */}
+        <div className="flex justify-end mb-4">
+          <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+            <button
+              onClick={() => setLang('en')}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${
+                lang === 'en' ? 'bg-[#0A5C36] text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLang('bn')}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${
+                lang === 'bn' ? 'bg-[#0A5C36] text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              BN
+            </button>
+          </div>
+        </div>
+
         <div className="text-center mb-12">
           <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
             Origin Agro Marketplace
@@ -120,7 +144,7 @@ export default function ProductMarketplace() {
                     : 'bg-white border text-gray-700 hover:border-[#0A5C36]'
                 }`}
               >
-                {cat === 'all' ? 'All Products' : cat} {count}
+                {cat === 'all' ? (lang === 'bn' ? 'সব পণ্য' : 'All Products') : cat} {count}
               </button>
             )
           })}
@@ -136,74 +160,81 @@ export default function ProductMarketplace() {
 
         {!loading && !errorMsg && filtered.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filtered.map((product) => (
-              <div
-                key={product.id}
-                onClick={() => window.location.href = `/product/${product.id}`}
-                className="bg-white rounded-2xl p-4 shadow-sm border flex flex-col hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="relative h-40 mb-3 overflow-hidden rounded-lg bg-gray-100">
-                  <Image
-                    src={product.image || '/placeholder.jpg'}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                  {product.badge && (
-                    <span className="absolute top-2 left-2 bg-[#0A5C36] text-white text-[10px] font-semibold px-2 py-1 rounded-full">
-                      {product.badge}
-                    </span>
-                  )}
-                  {!product.inStock && (
-                    <span className="absolute top-2 right-2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded-full">
-                      Out of Stock
-                    </span>
-                  )}
-                </div>
+            {filtered.map((product) => {
+              const displayName = (lang === 'bn' && product.nameBn) ? product.nameBn : product.name
+              const displayBadge = (lang === 'bn' && product.badgeBn) ? product.badgeBn : product.badge
+              const displayDescription = (lang === 'bn' && product.descriptionBn) ? product.descriptionBn : product.description
+              const displayDelivery = (lang === 'bn' && product.deliveryBn) ? product.deliveryBn : product.delivery
+              const displayUnit = (lang === 'bn' && product.unitBn) ? product.unitBn : product.unit
 
-                <div className="flex items-center gap-1 mb-1">
-                  <StarRating rating={product.rating} />
-                  <span className="text-[11px] text-gray-400">({product.reviews})</span>
-                </div>
-
-                <h3 className="font-bold text-sm text-gray-900">{product.name}</h3>
-                {product.nameBn && <p className="text-xs text-[#0A5C36] mb-1">{product.nameBn}</p>}
-
-                {product.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-1 my-2">
-                    {product.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
-                      >
-                        {tag}
+              return (
+                <div
+                  key={product.id}
+                  onClick={() => window.location.href = `/product/${product.id}`}
+                  className="bg-white rounded-2xl p-4 shadow-sm border flex flex-col hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <div className="relative h-40 mb-3 overflow-hidden rounded-lg bg-gray-100">
+                    <Image
+                      src={product.image || '/placeholder.jpg'}
+                      alt={displayName}
+                      fill
+                      className="object-cover"
+                    />
+                    {displayBadge && (
+                      <span className="absolute top-2 left-2 bg-[#0A5C36] text-white text-[10px] font-semibold px-2 py-1 rounded-full">
+                        {displayBadge}
                       </span>
-                    ))}
-                  </div>
-                )}
-
-                {product.description && (
-                  <p className="text-xs text-gray-500 mb-2 line-clamp-2">{product.description}</p>
-                )}
-
-                {product.delivery && (
-                  <div className="flex items-center gap-1 text-[11px] text-gray-500 mb-2">
-                    <Truck className="w-3 h-3" />
-                    {product.delivery}
-                  </div>
-                )}
-
-                <div className="mt-auto pt-2 border-t">
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-lg font-extrabold text-[#0A5C36]">{formatTaka(product.price)}</p>
-                    {product.originalPrice && (
-                      <p className="text-xs text-gray-400 line-through">{formatTaka(product.originalPrice)}</p>
+                    )}
+                    {!product.inStock && (
+                      <span className="absolute top-2 right-2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded-full">
+                        Out of Stock
+                      </span>
                     )}
                   </div>
-                  {product.unit && <p className="text-[11px] text-gray-400">{product.unit}</p>}
+
+                  <div className="flex items-center gap-1 mb-1">
+                    <StarRating rating={product.rating} />
+                    <span className="text-[11px] text-gray-400">({product.reviews})</span>
+                  </div>
+
+                  <h3 className="font-bold text-sm text-gray-900 mb-1">{displayName}</h3>
+
+                  {product.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 my-2">
+                      {product.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {displayDescription && (
+                    <p className="text-xs text-gray-500 mb-2 line-clamp-2">{displayDescription}</p>
+                  )}
+
+                  {displayDelivery && (
+                    <div className="flex items-center gap-1 text-[11px] text-gray-500 mb-2">
+                      <Truck className="w-3 h-3" />
+                      {displayDelivery}
+                    </div>
+                  )}
+
+                  <div className="mt-auto pt-2 border-t">
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-lg font-extrabold text-[#0A5C36]">{formatTaka(product.price)}</p>
+                      {product.originalPrice && (
+                        <p className="text-xs text-gray-400 line-through">{formatTaka(product.originalPrice)}</p>
+                      )}
+                    </div>
+                    {displayUnit && <p className="text-[11px] text-gray-400">{displayUnit}</p>}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
