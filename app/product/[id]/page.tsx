@@ -339,10 +339,15 @@ export default function ProductDetailPage() {
               <div className="flex items-center gap-2 mb-4">
                 <StarRating rating={avgRating || 0} />
                 <span className="text-sm text-gray-500">
-                  {reviews.length > 0
-                    ? `\( {avgRating.toFixed(1)} ( \){reviews.length} ${lang === 'EN' ? (reviews.length > 1 ? 'reviews' : 'review') : 'রিভিউ'})`
-                    : (lang === 'EN' ? 'No reviews yet' : 'এখনো কোনো রিভিউ নেই')}
-                </span>
+  {reviews.length > 0 ? (
+    <>
+      {avgRating.toFixed(1)} ({reviews.length}{' '}
+      {lang === 'EN' ? (reviews.length > 1 ? 'reviews' : 'review') : 'রিভিউ'})
+    </>
+  ) : (
+    lang === 'EN' ? 'No reviews yet' : 'এখনো কোনো রিভিউ নেই'
+  )}
+</span>
               </div>
 
               {product.tags?.length > 0 && (
