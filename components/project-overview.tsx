@@ -3,14 +3,6 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import {
-  Sprout, Hotel, Beef, HeartHandshake, BarChart3,
-  Leaf, TreePine, Wheat, Fish, Milk, Factory, Building2,
-'use client'
-
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/contexts/language-context'
 import {
   Sprout, Hotel, Beef, HeartHandshake, BarChart3,
