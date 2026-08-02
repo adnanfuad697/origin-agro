@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/contexts/language-context'
 
 function LinkedinIcon() {
   return (
@@ -32,6 +33,7 @@ interface TeamMember {
 }
 
 export default function ExecutiveTeam() {
+  const { lang } = useLanguage()
   const [team, setTeam] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -66,18 +68,29 @@ export default function ExecutiveTeam() {
     <section id="team" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">Leadership</p>
-          <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900">Meet Our Executive Team</h2>
+          <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
+            {lang === 'EN' ? 'Leadership' : 'নেতৃত্ব'}
+          </p>
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900">
+            {lang === 'EN' ? 'Meet Our Executive Team' : 'আমাদের নির্বাহী দলের সাথে পরিচিত হোন'}
+          </h2>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto leading-relaxed">
-            Driven by passion for sustainable agriculture and Shariah-compliant investment, our leadership
-            team brings decades of combined expertise.
+            {lang === 'EN'
+              ? 'Driven by passion for sustainable agriculture and Shariah-compliant investment, our leadership team brings decades of combined expertise.'
+              : 'টেকসই কৃষি ও শরিয়াহ-সম্মত বিনিয়োগের প্রতি অনুরাগ নিয়ে আমাদের নেতৃত্ব দল দশকের সম্মিলিত অভিজ্ঞতা নিয়ে এসেছে।'}
           </p>
         </div>
 
-        {loading && <div className="text-center py-10 text-gray-500">Loading team...</div>}
+        {loading && (
+          <div className="text-center py-10 text-gray-500">
+            {lang === 'EN' ? 'Loading team...' : 'টিম লোড হচ্ছে...'}
+          </div>
+        )}
 
         {!loading && team.length === 0 && (
-          <div className="text-center py-10 text-gray-500">Team members coming soon.</div>
+          <div className="text-center py-10 text-gray-500">
+            {lang === 'EN' ? 'Team members coming soon.' : 'টিম সদস্য শীঘ্রই আসছেন।'}
+          </div>
         )}
 
         {!loading && team.length > 0 && (

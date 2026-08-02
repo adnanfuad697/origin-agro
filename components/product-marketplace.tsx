@@ -28,6 +28,35 @@ interface Product {
   inStock: boolean
 }
 
+// Category labels – only one language shown at a time
+const categoryLabels: Record<string, { en: string; bn: string }> = {
+  all: { en: 'All Products', bn: 'সকল পণ্য' },
+  'Qurbani Cattle': { en: 'Qurbani Cattle', bn: 'কোরবানির পশু' },
+  'Dairy': { en: 'Dairy', bn: 'দুগ্ধজাত' },
+  'Organic Produce': { en: 'Organic Produce', bn: 'জৈব সবজি' },
+  'Livestock': { en: 'Livestock', bn: 'পশুপালন' },
+  'Cattle': { en: 'Cattle', bn: 'গরু' },
+  'Goat': { en: 'Goat', bn: 'ছাগল' },
+  'Chicken': { en: 'Chicken', bn: 'মুরগি' },
+  'Fish': { en: 'Fish', bn: 'মাছ' },
+  'Honey': { en: 'Honey', bn: 'মধু' },
+  'Eggs': { en: 'Eggs', bn: 'ডিম' },
+  'Vegetables': { en: 'Vegetables', bn: 'সবজি' },
+  'Fruits': { en: 'Fruits', bn: 'ফল' },
+}
+
+function getCategoryLabel(cat: string, lang: 'EN' | 'BN') {
+  const key = cat.trim()
+  const labels = categoryLabels[key]
+  if (labels) return lang === 'EN' ? labels.en : labels.bn
+  // Fallback: if the category itself contains both languages separated by / or |, pick one side
+  if (key.includes(' / ') || key.includes(' | ')) {
+    const parts = key.split(/\s*[\/|]\s*/)
+    return lang === 'EN' ? parts[0] : (parts[1] || parts[0])
+  }
+  return key
+}
+
 function formatTaka(amount: number) {
   return `৳ ${amount.toLocaleString('en-IN')}`
 }
@@ -120,7 +149,7 @@ export default function ProductMarketplace() {
                     ? 'bg-[#0A5C36] text-white shadow-md'
                     : 'bg-white border text-gray-700 hover:border-[#0A5C36]'
                 }`}>
-                {cat === 'all' ? (lang === 'EN' ? 'All Products' : 'সকল পণ্য') : cat} {count}
+                {getCategoryLabel(cat, lang)} {count}
               </button>
             )
           })}
@@ -144,7 +173,7 @@ export default function ProductMarketplace() {
                 <div className="relative h-40 mb-3 overflow-hidden rounded-lg bg-gray-100">
                   <Image
                     src={product.image || '/placeholder.jpg'}
-                    alt={product.name}
+                    alt={lang === 'EN' ? product.name : (product.nameBn || product.name)}
                     fill
                     className="object-cover" />
                   {product.badge && (
