@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/contexts/language-context'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
@@ -20,9 +21,12 @@ interface Product {
   price: number
   originalPrice: number | null
   unit: string | null
+  unitBn: string | null
   tags: string[]
   description: string | null
+  descriptionBn: string | null
   delivery: string | null
+  deliveryBn: string | null
   inStock: boolean
 }
 
@@ -52,6 +56,7 @@ export default function ProductDetailPage() {
   const params = useParams()
   const router = useRouter()
   const productId = params.id as string
+  const { lang } = useLanguage()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
@@ -94,9 +99,12 @@ export default function ProductDetailPage() {
         price: Number(productData.price),
         originalPrice: productData.original_price ? Number(productData.original_price) : null,
         unit: productData.unit,
+        unitBn: productData.unit_bn,
         tags: productData.tags ?? [],
         description: productData.description,
+        descriptionBn: productData.description_bn,
         delivery: productData.delivery,
+        deliveryBn: productData.delivery_bn,
         inStock: productData.in_stock ?? true,
       })
     }
@@ -128,7 +136,7 @@ export default function ProductDetailPage() {
     e.preventDefault()
     setReviewMsg('')
     if (!reviewerName || !reviewComment) {
-      setReviewMsg('Please enter your name and a comment.')
+      setReviewMsg(lang === 'EN' ? 'Please enter your name and a comment.' : 'অনুগ্রহ করে আপনার নাম ও মন্তব্য লিখুন।')
       return
     }
     setSubmittingReview(true)
@@ -140,12 +148,12 @@ export default function ProductDetailPage() {
     }])
     setSubmittingReview(false)
     if (error) {
-      setReviewMsg('Something went wrong submitting your review.')
+      setReviewMsg(lang === 'EN' ? 'Something went wrong submitting your review.' : 'রিভিউ জমা দিতে সমস্যা হয়েছে।')
     } else {
       setReviewerName('')
       setReviewComment('')
       setReviewRating(5)
-      setReviewMsg('Thank you for your review!')
+      setReviewMsg(lang === 'EN' ? 'Thank you for your review!' : 'আপনার রিভিউর জন্য ধন্যবাদ!')
       fetchData()
     }
   }
@@ -166,7 +174,7 @@ export default function ProductDetailPage() {
       })
     }
     window.localStorage.setItem('origin-agro-cart', JSON.stringify(existingCart))
-    setCartMsg('Added to cart!')
+    setCartMsg(lang === 'EN' ? 'Added to cart!' : 'কার্টে যোগ হয়েছে!')
     setTimeout(() => setCartMsg(''), 2500)
   }
 
@@ -177,7 +185,6 @@ export default function ProductDetailPage() {
       return
     }
 
-    // Auto-fill address from their saved profile, if they have one
     const { data: profile } = await supabase
       .from('customer_profiles')
       .select('mobile_number, division, district, upazila, village_or_area, google_maps_link')
@@ -203,11 +210,13 @@ export default function ProductDetailPage() {
     const hasMapsLink = googleMapsLink.trim().length > 0
 
     if (!mobileNumber) {
-      setOrderMsg('Please enter your mobile number.')
+      setOrderMsg(lang === 'EN' ? 'Please enter your mobile number.' : 'অনুগ্রহ করে মোবাইল নম্বর দিন।')
       return
     }
     if (!hasMapsLink && (!division || !district || !upazila)) {
-      setOrderMsg('Please provide a Google Maps link, or fill in Division, District, and Upazila.')
+      setOrderMsg(lang === 'EN'
+        ? 'Please provide a Google Maps link, or fill in Division, District, and Upazila.'
+        : 'অনুগ্রহ করে গুগল ম্যাপস লিংক দিন, অথবা বিভাগ, জেলা ও উপজেলা পূরণ করুন।')
       return
     }
     if (!product) return
@@ -222,7 +231,7 @@ export default function ProductDetailPage() {
 
     const addressSummary = hasMapsLink
       ? googleMapsLink
-      : `${villageOrArea ? villageOrArea + ', ' : ''}${upazila}, ${district}, ${division}`
+      : `\( {villageOrArea ? villageOrArea + ', ' : ''} \){upazila}, ${district}, ${division}`
 
     const { error } = await supabase.from('orders').insert([{
       user_id: session.user.id,
@@ -257,7 +266,7 @@ export default function ProductDetailPage() {
     setPlacingOrder(false)
 
     if (error) {
-      setOrderMsg('Something went wrong placing your order. Please try again.')
+      setOrderMsg(lang === 'EN' ? 'Something went wrong placing your order. Please try again.' : 'অর্ডার করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
     } else {
       setOrderPlaced(true)
     }
@@ -268,7 +277,9 @@ export default function ProductDetailPage() {
       <main>
         <TopBar />
         <Navbar />
-        <div className="text-center py-24 text-gray-500">Loading product...</div>
+        <div className="text-center py-24 text-gray-500">
+          {lang === 'EN' ? 'Loading product...' : 'পণ্য লোড হচ্ছে...'}
+        </div>
         <MegaFooter />
       </main>
     )
@@ -279,11 +290,19 @@ export default function ProductDetailPage() {
       <main>
         <TopBar />
         <Navbar />
-        <div className="text-center py-24 text-gray-500">Product not found.</div>
+        <div className="text-center py-24 text-gray-500">
+          {lang === 'EN' ? 'Product not found.' : 'পণ্য পাওয়া যায়নি।'}
+        </div>
         <MegaFooter />
       </main>
     )
   }
+
+  // Single language values
+  const displayName = lang === 'EN' ? product.name : (product.nameBn || product.name)
+  const displayDescription = lang === 'EN' ? product.description : (product.descriptionBn || product.description)
+  const displayDelivery = lang === 'EN' ? product.delivery : (product.deliveryBn || product.delivery)
+  const displayUnit = lang === 'EN' ? product.unit : (product.unitBn || product.unit)
 
   return (
     <main>
@@ -294,14 +313,14 @@ export default function ProductDetailPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <a href="/#shop" className="inline-flex items-center gap-1.5 text-gray-600 hover:text-[#0A5C36] text-sm font-medium mb-6">
             <ArrowLeft className="w-4 h-4" />
-            Back to Shop
+            {lang === 'EN' ? 'Back to Shop' : 'শপে ফিরে যান'}
           </a>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
             {/* Image / Video */}
             <div>
               <div className="relative h-80 sm:h-96 rounded-xl overflow-hidden bg-gray-100">
-                <Image src={product.image || '/placeholder.jpg'} alt={product.name} fill className="object-cover" />
+                <Image src={product.image || '/placeholder.jpg'} alt={displayName} fill className="object-cover" />
               </div>
               {product.videoUrl && (
                 <div className="mt-4 aspect-video rounded-xl overflow-hidden bg-black">
@@ -313,13 +332,16 @@ export default function ProductDetailPage() {
             {/* Details */}
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-[#F26522] mb-2">{product.category}</p>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">{product.name}</h1>
-              {product.nameBn && <p className="text-[#0A5C36] text-sm mb-3">{product.nameBn}</p>}
+              
+              {/* Only ONE language name */}
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">{displayName}</h1>
 
               <div className="flex items-center gap-2 mb-4">
                 <StarRating rating={avgRating || 0} />
                 <span className="text-sm text-gray-500">
-                  {reviews.length > 0 ? `${avgRating.toFixed(1)} (${reviews.length} review${reviews.length > 1 ? 's' : ''})` : 'No reviews yet'}
+                  {reviews.length > 0
+                    ? `\( {avgRating.toFixed(1)} ( \){reviews.length} ${lang === 'EN' ? (reviews.length > 1 ? 'reviews' : 'review') : 'রিভিউ'})`
+                    : (lang === 'EN' ? 'No reviews yet' : 'এখনো কোনো রিভিউ নেই')}
                 </span>
               </div>
 
@@ -331,24 +353,28 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {product.description && <p className="text-gray-600 text-sm leading-relaxed mb-4">{product.description}</p>}
+              {displayDescription && (
+                <p className="text-gray-600 text-sm leading-relaxed mb-4">{displayDescription}</p>
+              )}
 
-              {product.delivery && (
+              {displayDelivery && (
                 <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
                   <Truck className="w-4 h-4" />
-                  {product.delivery}
+                  {displayDelivery}
                 </div>
               )}
 
               <div className="flex items-baseline gap-3 mb-6">
                 <p className="text-3xl font-extrabold text-[#0A5C36]">{formatTaka(product.price)}</p>
                 {product.originalPrice && <p className="text-gray-400 line-through">{formatTaka(product.originalPrice)}</p>}
-                {product.unit && <p className="text-gray-400 text-sm">/ {product.unit}</p>}
+                {displayUnit && <p className="text-gray-400 text-sm">/ {displayUnit}</p>}
               </div>
 
               {/* Quantity */}
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-sm font-bold text-gray-700">Quantity</span>
+                <span className="text-sm font-bold text-gray-700">
+                  {lang === 'EN' ? 'Quantity' : 'পরিমাণ'}
+                </span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-1.5 text-gray-600 hover:bg-gray-50">−</button>
                   <span className="px-4 py-1.5 text-sm font-bold">{quantity}</span>
@@ -360,11 +386,11 @@ export default function ProductDetailPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={handleAddToCart} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors">
                   <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
+                  {lang === 'EN' ? 'Add to Cart' : 'কার্টে যোগ করুন'}
                 </button>
                 <button onClick={handleBuyNowClick} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold bg-[#F26522] hover:bg-[#d4551a] text-white transition-colors">
                   <Zap className="w-4 h-4" />
-                  Buy Now
+                  {lang === 'EN' ? 'Buy Now' : 'এখনই কিনুন'}
                 </button>
               </div>
               {cartMsg && <p className="text-[#0A5C36] text-sm font-medium mt-3">{cartMsg}</p>}
@@ -372,34 +398,57 @@ export default function ProductDetailPage() {
               {/* Buy Now Form */}
               {showBuyForm && !orderPlaced && (
                 <form onSubmit={handlePlaceOrder} className="mt-6 bg-[#F7F4EE] rounded-xl p-5 space-y-3">
-                  <p className="font-bold text-gray-900 text-sm">Complete Your Order</p>
-                  <input type="tel" value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} placeholder="Mobile Number *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
+                  <p className="font-bold text-gray-900 text-sm">
+                    {lang === 'EN' ? 'Complete Your Order' : 'আপনার অর্ডার সম্পন্ন করুন'}
+                  </p>
+                  <input
+                    type="tel"
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    placeholder={lang === 'EN' ? 'Mobile Number *' : 'মোবাইল নম্বর *'}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                  />
 
                   <AddressFields
                     division={division} setDivision={setDivision}
                     district={district} setDistrict={setDistrict}
                     upazila={upazila} setUpazila={setUpazila}
                     villageOrArea={villageOrArea} setVillageOrArea={setVillageOrArea}
-                    googleMapsLink={googleMapsLink} setGoogleMapsLink={setGoogleMapsLink} />
+                    googleMapsLink={googleMapsLink} setGoogleMapsLink={setGoogleMapsLink}
+                  />
 
-                  <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white">
-                    <option value="cash_on_delivery">Cash on Delivery</option>
-                    <option value="bkash">bKash (pay on confirmation)</option>
-                    <option value="nagad">Nagad (pay on confirmation)</option>
-                    <option value="bank">Bank Transfer (pay on confirmation)</option>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white"
+                  >
+                    <option value="cash_on_delivery">{lang === 'EN' ? 'Cash on Delivery' : 'ক্যাশ অন ডেলিভারি'}</option>
+                    <option value="bkash">{lang === 'EN' ? 'bKash (pay on confirmation)' : 'বিকাশ (নিশ্চিতকরণে পেমেন্ট)'}</option>
+                    <option value="nagad">{lang === 'EN' ? 'Nagad (pay on confirmation)' : 'নগদ (নিশ্চিতকরণে পেমেন্ট)'}</option>
+                    <option value="bank">{lang === 'EN' ? 'Bank Transfer (pay on confirmation)' : 'ব্যাংক ট্রান্সফার (নিশ্চিতকরণে পেমেন্ট)'}</option>
                   </select>
-                  <p className="text-sm font-bold text-gray-800">Total: {formatTaka(product.price * quantity)}</p>
+                  <p className="text-sm font-bold text-gray-800">
+                    {lang === 'EN' ? 'Total' : 'মোট'}: {formatTaka(product.price * quantity)}
+                  </p>
                   {orderMsg && <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2">{orderMsg}</p>}
                   <button type="submit" disabled={placingOrder} className="w-full py-3 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors disabled:opacity-60">
-                    {placingOrder ? 'Placing Order...' : 'Confirm Order'}
+                    {placingOrder
+                      ? (lang === 'EN' ? 'Placing Order...' : 'অর্ডার করা হচ্ছে...')
+                      : (lang === 'EN' ? 'Confirm Order' : 'অর্ডার নিশ্চিত করুন')}
                   </button>
                 </form>
               )}
 
               {orderPlaced && (
                 <div className="mt-6 bg-[#F7F4EE] border border-[#0A5C36]/20 rounded-xl p-5 text-center">
-                  <p className="font-bold text-gray-900">Order Placed!</p>
-                  <p className="text-gray-600 text-sm mt-1">We&apos;ll contact you shortly to confirm delivery details.</p>
+                  <p className="font-bold text-gray-900">
+                    {lang === 'EN' ? 'Order Placed!' : 'অর্ডার সম্পন্ন হয়েছে!'}
+                  </p>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {lang === 'EN'
+                      ? "We'll contact you shortly to confirm delivery details."
+                      : 'ডেলিভারি বিস্তারিত নিশ্চিত করতে আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।'}
+                  </p>
                 </div>
               )}
             </div>
@@ -407,9 +456,15 @@ export default function ProductDetailPage() {
 
           {/* Reviews Section */}
           <div className="mt-8 bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
-            <h2 className="text-xl font-extrabold text-gray-900 mb-6">Customer Reviews</h2>
+            <h2 className="text-xl font-extrabold text-gray-900 mb-6">
+              {lang === 'EN' ? 'Customer Reviews' : 'কাস্টমার রিভিউ'}
+            </h2>
 
-            {reviews.length === 0 && <p className="text-gray-500 text-sm mb-6">No reviews yet. Be the first to review this product!</p>}
+            {reviews.length === 0 && (
+              <p className="text-gray-500 text-sm mb-6">
+                {lang === 'EN' ? 'No reviews yet. Be the first to review this product!' : 'এখনো কোনো রিভিউ নেই। প্রথম রিভিউ দিন!'}
+              </p>
+            )}
 
             <div className="space-y-5 mb-8">
               {reviews.map((review) => (
@@ -430,7 +485,9 @@ export default function ProductDetailPage() {
 
             {/* Review Form */}
             <form onSubmit={handleReviewSubmit} className="bg-[#F7F4EE] rounded-xl p-5 space-y-3">
-              <p className="font-bold text-gray-900 text-sm">Write a Review</p>
+              <p className="font-bold text-gray-900 text-sm">
+                {lang === 'EN' ? 'Write a Review' : 'রিভিউ লিখুন'}
+              </p>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <button key={i} type="button" onClick={() => setReviewRating(i)}>
@@ -438,11 +495,25 @@ export default function ProductDetailPage() {
                   </button>
                 ))}
               </div>
-              <input type="text" value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} placeholder="Your Name *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
-              <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} placeholder="Share your experience with this product *" rows={3} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm resize-none" />
+              <input
+                type="text"
+                value={reviewerName}
+                onChange={(e) => setReviewerName(e.target.value)}
+                placeholder={lang === 'EN' ? 'Your Name *' : 'আপনার নাম *'}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+              />
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder={lang === 'EN' ? 'Share your experience with this product *' : 'এই পণ্য নিয়ে আপনার অভিজ্ঞতা শেয়ার করুন *'}
+                rows={3}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm resize-none"
+              />
               {reviewMsg && <p className="text-sm text-[#0A5C36] font-medium">{reviewMsg}</p>}
               <button type="submit" disabled={submittingReview} className="py-2.5 px-6 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors disabled:opacity-60 text-sm">
-                {submittingReview ? 'Submitting...' : 'Submit Review'}
+                {submittingReview
+                  ? (lang === 'EN' ? 'Submitting...' : 'জমা হচ্ছে...')
+                  : (lang === 'EN' ? 'Submit Review' : 'রিভিউ জমা দিন')}
               </button>
             </form>
           </div>
