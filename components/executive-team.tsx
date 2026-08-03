@@ -26,7 +26,9 @@ interface TeamMember {
   id: number
   name: string
   designation: string
+  designationBn: string | null
   bio: string | null
+  bioBn: string | null
   image: string | null
   linkedin: string | null
   twitter: string | null
@@ -52,7 +54,9 @@ export default function ExecutiveTeam() {
           id: row.id,
           name: row.name,
           designation: row.role,
+          designationBn: row.role_bn || null,
           bio: row.bio,
+          bioBn: row.bio_bn || null,
           image: row.image,
           linkedin: row.linkedin_url,
           twitter: row.twitter_url,
@@ -102,11 +106,18 @@ export default function ExecutiveTeam() {
                 </div>
 
                 <h3 className="text-xl font-extrabold text-gray-900">{member.name}</h3>
-                <p className="text-[#0A5C36] font-semibold text-sm mt-1">{member.designation}</p>
+                
+                <p className="text-[#0A5C36] font-semibold text-sm mt-1">
+                  {lang === 'EN' ? member.designation : (member.designationBn || member.designation)}
+                </p>
 
                 <div className="w-10 h-0.5 bg-[#F26522] rounded-full my-4" />
 
-                {member.bio && <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>}
+                {(member.bio || member.bioBn) && (
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {lang === 'EN' ? member.bio : (member.bioBn || member.bio)}
+                  </p>
+                )}
 
                 {(member.linkedin || member.twitter) && (
                   <div className="flex items-center gap-3 mt-6">
