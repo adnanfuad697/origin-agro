@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import { Phone, Mail, MapPin } from 'lucide-react'
 import ContactForm from '@/components/contact-form'
@@ -32,7 +34,18 @@ export default function MegaFooter() {
     <footer id="footer" className="bg-[#063D24] text-white">
       {/* Map Section */}
       <div className="w-full h-64 md:h-80 bg-[#0A5C36] relative overflow-hidden border-b border-white/10">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3649.3!2d90.4!3d23.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDQ4JzAwLjAiTiA5MMKwMjQnMDAuMCJF!5e0!3m2!1sen!2sbd!4v1234567890" width="100%" height="100%" style={{ border: 0, filter: 'grayscale(30%) contrast(1.1) brightness(0.9)' }} allowFullScreen loading="lazy" title="Origin Agro Location Map" referrerPolicy="no-referrer-when-downgrade" />
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3649.3!2d90.4!3d23.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDQ4JzAwLjAiTiA5MMKwMjQnMDAuMCJF!5e0!3m2!1sen!2sbd!4v1234567890"
+          width="100%"
+          height="100%"
+          style={{ border: 0, filter: 'grayscale(30%) contrast(1.1) brightness(0.9)' }}
+          allowFullScreen
+          loading="lazy"
+          title="Origin Agro Location Map"
+          referrerPolicy="no-referrer-when-downgrade"
+          tabIndex={-1}
+          onLoad={(e) => e.currentTarget.blur()}
+        />
         <div className="absolute inset-0 pointer-events-none bg-[#0A5C36]/20" />
         {/* Map Pin Overlay */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full">
