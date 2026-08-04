@@ -82,6 +82,8 @@ export default function ProductDetailPage() {
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderMsg, setOrderMsg] = useState('')
   const [orderPlaced, setOrderPlaced] = useState(false)
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false)
+  const [transactionId, setTransactionId] = useState('')
 
   const [cartMsg, setCartMsg] = useState('')
 
@@ -219,6 +221,12 @@ export default function ProductDetailPage() {
         : 'অনুগ্রহ করে গুগল ম্যাপস লিংক দিন, অথবা বিভাগ, জেলা ও উপজেলা পূরণ করুন।')
       return
     }
+
+    if ((paymentMethod === 'bkash' || paymentMethod === 'nagad') && !transactionId.trim()) {
+      setOrderMsg(lang === 'EN' ? 'Please enter the Transaction ID.' : 'অনুগ্রহ করে ট্রানজেকশন আইডি লিখুন।')
+      return
+    }
+
     if (!product) return
 
     setPlacingOrder(true)
@@ -244,6 +252,8 @@ export default function ProductDetailPage() {
       delivery_address: addressSummary,
       mobile_number: mobileNumber,
       payment_method: paymentMethod,
+      payment_status: 'unpaid',
+      transaction_id: transactionId.trim() || null,
       status: 'pending',
       division: division || null,
       district: district || null,
@@ -298,7 +308,6 @@ export default function ProductDetailPage() {
     )
   }
 
-  // Single language values
   const displayName = lang === 'EN' ? product.name : (product.nameBn || product.name)
   const displayDescription = lang === 'EN' ? product.description : (product.descriptionBn || product.description)
   const displayDelivery = lang === 'EN' ? product.delivery : (product.deliveryBn || product.delivery)
@@ -333,21 +342,20 @@ export default function ProductDetailPage() {
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-[#F26522] mb-2">{product.category}</p>
               
-              {/* Only ONE language name */}
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">{displayName}</h1>
 
               <div className="flex items-center gap-2 mb-4">
                 <StarRating rating={avgRating || 0} />
                 <span className="text-sm text-gray-500">
-  {reviews.length > 0 ? (
-    <>
-      {avgRating.toFixed(1)} ({reviews.length}{' '}
-      {lang === 'EN' ? (reviews.length > 1 ? 'reviews' : 'review') : 'রিভিউ'})
-    </>
-  ) : (
-    lang === 'EN' ? 'No reviews yet' : 'এখনো কোনো রিভিউ নেই'
-  )}
-</span>
+                  {reviews.length > 0 ? (
+                    <>
+                      {avgRating.toFixed(1)} ({reviews.length}{' '}
+                      {lang === 'EN' ? (reviews.length > 1 ? 'reviews' : 'review') : 'রিভিউ'})
+                    </>
+                  ) : (
+                    lang === 'EN' ? 'No reviews yet' : 'এখনো কোনো রিভিউ নেই'
+                  )}
+                </span>
               </div>
 
               {product.tags?.length > 0 && (
@@ -424,19 +432,75 @@ export default function ProductDetailPage() {
 
                   <select
                     value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    onChange={(e) => {
+                      setPaymentMethod(e.target.value)
+                      setShowPaymentInfo(false)
+                      setTransactionId('')
+                    }}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white"
                   >
                     <option value="cash_on_delivery">{lang === 'EN' ? 'Cash on Delivery' : 'ক্যাশ অন ডেলিভারি'}</option>
-                    <option value="bkash">{lang === 'EN' ? 'bKash (pay on confirmation)' : 'বিকাশ (নিশ্চিতকরণে পেমেন্ট)'}</option>
-                    <option value="nagad">{lang === 'EN' ? 'Nagad (pay on confirmation)' : 'নগদ (নিশ্চিতকরণে পেমেন্ট)'}</option>
-                    <option value="bank">{lang === 'EN' ? 'Bank Transfer (pay on confirmation)' : 'ব্যাংক ট্রান্সফার (নিশ্চিতকরণে পেমেন্ট)'}</option>
+                    <option value="bkash">{lang === 'EN' ? 'bKash' : 'বিকাশ'}</option>
+                    <option value="nagad">{lang === 'EN' ? 'Nagad' : 'নগদ'}</option>
+                    <option value="bank">{lang === 'EN' ? 'Bank Transfer' : 'ব্যাংক ট্রান্সফার'}</option>
                   </select>
+
+                  {/* bKash / Nagad Payment Box */}
+                  {(paymentMethod === 'bkash' || paymentMethod === 'nagad') && (
+                    <div className="bg-white border border-[#0A5C36]/20 rounded-xl p-4 space-y-3 text-sm">
+                      <p className="font-bold text-gray-900">
+                        {paymentMethod === 'bkash'
+                          ? (lang === 'EN' ? 'Pay with bKash' : 'বিকাশে পেমেন্ট করুন')
+                          : (lang === 'EN' ? 'Pay with Nagad' : 'নগদে পেমেন্ট করুন')}
+                      </p>
+                      <p className="text-gray-700">
+                        {lang === 'EN' ? 'Number:' : 'নম্বর:'} <span className="font-extrabold text-[#0A5C36]">01586207756</span>
+                      </p>
+                      <p className="text-gray-700">
+                        {lang === 'EN' ? 'Amount:' : 'পরিমাণ:'} <span className="font-extrabold">{formatTaka(product.price * quantity)}</span>
+                      </p>
+                      <ol className="list-decimal list-inside text-gray-600 space-y-1">
+                        <li>{lang === 'EN' ? 'Open bKash / Nagad app' : 'বিকাশ / নগদ অ্যাপ খুলুন'}</li>
+                        <li>{lang === 'EN' ? 'Select Send Money' : 'সেন্ড মানি সিলেক্ট করুন'}</li>
+                        <li>{lang === 'EN' ? 'Enter the number above' : 'উপরের নম্বরটি দিন'}</li>
+                        <li>{lang === 'EN' ? 'Enter the exact amount' : 'সঠিক পরিমাণ দিন'}</li>
+                        <li>{lang === 'EN' ? 'Complete the payment' : 'পেমেন্ট সম্পন্ন করুন'}</li>
+                      </ol>
+                      <p className="text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs">
+                        {lang === 'EN'
+                          ? '⚠️ Important: After payment, collect the Transaction ID from the confirmation SMS or app history.'
+                          : '⚠️ গুরুত্বপূর্ণ: পেমেন্টের পর কনফার্মেশন SMS বা অ্যাপ হিস্টরি থেকে ট্রানজেকশন আইডি সংগ্রহ করুন।'}
+                      </p>
+
+                      {!showPaymentInfo ? (
+                        <button
+                          type="button"
+                          onClick={() => setShowPaymentInfo(true)}
+                          className="w-full py-2.5 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors"
+                        >
+                          {lang === 'EN' ? 'I have paid' : 'আমি পেমেন্ট করেছি'}
+                        </button>
+                      ) : (
+                        <input
+                          type="text"
+                          value={transactionId}
+                          onChange={(e) => setTransactionId(e.target.value)}
+                          placeholder={lang === 'EN' ? 'Enter Transaction ID *' : 'ট্রানজেকশন আইডি লিখুন *'}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                        />
+                      )}
+                    </div>
+                  )}
+
                   <p className="text-sm font-bold text-gray-800">
                     {lang === 'EN' ? 'Total' : 'মোট'}: {formatTaka(product.price * quantity)}
                   </p>
                   {orderMsg && <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2">{orderMsg}</p>}
-                  <button type="submit" disabled={placingOrder} className="w-full py-3 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors disabled:opacity-60">
+                  <button
+                    type="submit"
+                    disabled={placingOrder || ((paymentMethod === 'bkash' || paymentMethod === 'nagad') && !showPaymentInfo)}
+                    className="w-full py-3 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors disabled:opacity-60"
+                  >
                     {placingOrder
                       ? (lang === 'EN' ? 'Placing Order...' : 'অর্ডার করা হচ্ছে...')
                       : (lang === 'EN' ? 'Confirm Order' : 'অর্ডার নিশ্চিত করুন')}
@@ -447,12 +511,12 @@ export default function ProductDetailPage() {
               {orderPlaced && (
                 <div className="mt-6 bg-[#F7F4EE] border border-[#0A5C36]/20 rounded-xl p-5 text-center">
                   <p className="font-bold text-gray-900">
-                    {lang === 'EN' ? 'Order Placed!' : 'অর্ডার সম্পন্ন হয়েছে!'}
+                    {lang === 'EN' ? 'Order Received!' : 'অর্ডার গ্রহণ করা হয়েছে!'}
                   </p>
                   <p className="text-gray-600 text-sm mt-1">
                     {lang === 'EN'
-                      ? "We'll contact you shortly to confirm delivery details."
-                      : 'ডেলিভারি বিস্তারিত নিশ্চিত করতে আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।'}
+                      ? 'We have received your order. Within a few hours your order history will be updated from Unpaid to Paid after we verify the transaction.'
+                      : 'আমরা আপনার অর্ডার পেয়েছি। ট্রানজেকশন যাচাই করার পর কয়েক ঘণ্টার মধ্যে আপনার অর্ডার হিস্টরি Unpaid থেকে Paid-এ আপডেট হবে।'}
                   </p>
                 </div>
               )}
