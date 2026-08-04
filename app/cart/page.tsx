@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/contexts/language-context'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
@@ -24,6 +25,7 @@ function formatTaka(amount: number) {
 
 export default function CartPage() {
   const router = useRouter()
+  const { lang } = useLanguage()
   const [cart, setCart] = useState<CartItem[]>([])
   const [loaded, setLoaded] = useState(false)
 
@@ -38,6 +40,8 @@ export default function CartPage() {
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderMsg, setOrderMsg] = useState('')
   const [orderPlaced, setOrderPlaced] = useState(false)
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false)
+  const [transactionId, setTransactionId] = useState('')
 
   useEffect(() => {
     const stored = JSON.parse(window.localStorage.getItem('origin-agro-cart') || '[]')
@@ -71,7 +75,6 @@ export default function CartPage() {
       return
     }
 
-    // Auto-fill address from their saved profile, if they have one
     const { data: profile } = await supabase
       .from('customer_profiles')
       .select('mobile_number, division, district, upazila, village_or_area, google_maps_link')
@@ -97,11 +100,18 @@ export default function CartPage() {
     const hasMapsLink = googleMapsLink.trim().length > 0
 
     if (!mobileNumber) {
-      setOrderMsg('Please enter your mobile number.')
+      setOrderMsg(lang === 'EN' ? 'Please enter your mobile number.' : 'অনুগ্রহ করে মোবাইল নম্বর দিন।')
       return
     }
     if (!hasMapsLink && (!division || !district || !upazila)) {
-      setOrderMsg('Please provide a Google Maps link, or fill in Division, District, and Upazila.')
+      setOrderMsg(lang === 'EN'
+        ? 'Please provide a Google Maps link, or fill in Division, District, and Upazila.'
+        : 'অনুগ্রহ করে গুগল ম্যাপস লিংক দিন, অথবা বিভাগ, জেলা ও উপজেলা পূরণ করুন।')
+      return
+    }
+
+    if ((paymentMethod === 'bkash' || paymentMethod === 'nagad') && !transactionId.trim()) {
+      setOrderMsg(lang === 'EN' ? 'Please enter the Transaction ID.' : 'অনুগ্রহ করে ট্রানজেকশন আইডি লিখুন।')
       return
     }
 
@@ -115,7 +125,7 @@ export default function CartPage() {
 
     const addressSummary = hasMapsLink
       ? googleMapsLink
-      : `${villageOrArea ? villageOrArea + ', ' : ''}${upazila}, ${district}, ${division}`
+      : `\( {villageOrArea ? villageOrArea + ', ' : ''} \){upazila}, ${district}, ${division}`
 
     const rows = cart.map((item) => ({
       user_id: session.user.id,
@@ -128,6 +138,8 @@ export default function CartPage() {
       delivery_address: addressSummary,
       mobile_number: mobileNumber,
       payment_method: paymentMethod,
+      payment_status: 'unpaid',
+      transaction_id: transactionId.trim() || null,
       status: 'pending',
       division: division || null,
       district: district || null,
@@ -139,7 +151,6 @@ export default function CartPage() {
     const { error } = await supabase.from('orders').insert(rows)
 
     if (!error) {
-      // Save this address to their profile for next time
       await supabase.from('customer_profiles').update({
         mobile_number: mobileNumber,
         division: division || null,
@@ -153,7 +164,7 @@ export default function CartPage() {
     setPlacingOrder(false)
 
     if (error) {
-      setOrderMsg('Something went wrong placing your order. Please try again.')
+      setOrderMsg(lang === 'EN' ? 'Something went wrong placing your order. Please try again.' : 'অর্ডার করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
     } else {
       saveCart([])
       setOrderPlaced(true)
@@ -169,31 +180,40 @@ export default function CartPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <a href="/#shop" className="inline-flex items-center gap-1.5 text-gray-600 hover:text-[#0A5C36] text-sm font-medium mb-6">
             <ArrowLeft className="w-4 h-4" />
-            Continue Shopping
+            {lang === 'EN' ? 'Continue Shopping' : 'কেনাকাটা চালিয়ে যান'}
           </a>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">Your Cart</h1>
-          <p className="text-[#0A5C36] text-sm mb-8">আপনার কার্ট</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">
+            {lang === 'EN' ? 'Your Cart' : 'আপনার কার্ট'}
+          </h1>
 
           {orderPlaced ? (
             <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
               <div className="w-16 h-16 bg-[#0A5C36] rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
-              <h2 className="font-extrabold text-gray-900 text-xl mb-1">Order Placed!</h2>
-              <p className="text-gray-600 text-sm mb-6">We&apos;ll contact you shortly to confirm delivery details.</p>
+              <h2 className="font-extrabold text-gray-900 text-xl mb-1">
+                {lang === 'EN' ? 'Order Received!' : 'অর্ডার গ্রহণ করা হয়েছে!'}
+              </h2>
+              <p className="text-gray-600 text-sm mb-6">
+                {lang === 'EN'
+                  ? 'We have received your order. Within a few hours your order history will be updated from Unpaid to Paid after we verify the transaction.'
+                  : 'আমরা আপনার অর্ডার পেয়েছি। ট্রানজেকশন যাচাই করার পর কয়েক ঘণ্টার মধ্যে আপনার অর্ডার হিস্টরি Unpaid থেকে Paid-এ আপডেট হবে।'}
+              </p>
               <a href="/account" className="inline-block bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
-                View My Orders
+                {lang === 'EN' ? 'View My Orders' : 'আমার অর্ডার দেখুন'}
               </a>
             </div>
           ) : !loaded ? (
-            <div className="text-center py-16 text-gray-500">Loading cart...</div>
+            <div className="text-center py-16 text-gray-500">
+              {lang === 'EN' ? 'Loading cart...' : 'কার্ট লোড হচ্ছে...'}
+            </div>
           ) : cart.length === 0 ? (
             <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
               <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">Your cart is empty.</p>
+              <p className="text-gray-500">{lang === 'EN' ? 'Your cart is empty.' : 'আপনার কার্ট খালি।'}</p>
               <a href="/#shop" className="inline-block mt-4 bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
-                Browse Shop
+                {lang === 'EN' ? 'Browse Shop' : 'শপ দেখুন'}
               </a>
             </div>
           ) : (
@@ -223,43 +243,114 @@ export default function CartPage() {
 
               {/* Summary */}
               <div className="bg-white rounded-2xl p-6 shadow-sm h-fit">
-                <h3 className="font-extrabold text-gray-900 mb-4">Order Summary</h3>
+                <h3 className="font-extrabold text-gray-900 mb-4">
+                  {lang === 'EN' ? 'Order Summary' : 'অর্ডার সারাংশ'}
+                </h3>
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Subtotal</span>
+                  <span>{lang === 'EN' ? 'Subtotal' : 'সাবটোটাল'}</span>
                   <span>{formatTaka(total)}</span>
                 </div>
                 <div className="border-t border-gray-100 my-3" />
                 <div className="flex justify-between font-extrabold text-gray-900 mb-5">
-                  <span>Total</span>
+                  <span>{lang === 'EN' ? 'Total' : 'মোট'}</span>
                   <span>{formatTaka(total)}</span>
                 </div>
 
                 {!showCheckout && (
                   <button onClick={handleCheckoutClick} className="w-full py-3.5 rounded-xl font-bold bg-[#F26522] hover:bg-[#d4551a] text-white transition-colors">
-                    Proceed to Checkout
+                    {lang === 'EN' ? 'Proceed to Checkout' : 'চেকআউটে যান'}
                   </button>
                 )}
 
                 {showCheckout && (
                   <form onSubmit={handlePlaceOrder} className="space-y-3 mt-2">
-                    <input type="tel" value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} placeholder="Mobile Number *" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm" />
+                    <input
+                      type="tel"
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
+                      placeholder={lang === 'EN' ? 'Mobile Number *' : 'মোবাইল নম্বর *'}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                    />
 
                     <AddressFields
                       division={division} setDivision={setDivision}
                       district={district} setDistrict={setDistrict}
                       upazila={upazila} setUpazila={setUpazila}
                       villageOrArea={villageOrArea} setVillageOrArea={setVillageOrArea}
-                      googleMapsLink={googleMapsLink} setGoogleMapsLink={setGoogleMapsLink} />
+                      googleMapsLink={googleMapsLink} setGoogleMapsLink={setGoogleMapsLink}
+                    />
 
-                    <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white">
-                      <option value="cash_on_delivery">Cash on Delivery</option>
-                      <option value="bkash">bKash (pay on confirmation)</option>
-                      <option value="nagad">Nagad (pay on confirmation)</option>
-                      <option value="bank">Bank Transfer (pay on confirmation)</option>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => {
+                        setPaymentMethod(e.target.value)
+                        setShowPaymentInfo(false)
+                        setTransactionId('')
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm bg-white"
+                    >
+                      <option value="cash_on_delivery">{lang === 'EN' ? 'Cash on Delivery' : 'ক্যাশ অন ডেলিভারি'}</option>
+                      <option value="bkash">{lang === 'EN' ? 'bKash' : 'বিকাশ'}</option>
+                      <option value="nagad">{lang === 'EN' ? 'Nagad' : 'নগদ'}</option>
+                      <option value="bank">{lang === 'EN' ? 'Bank Transfer' : 'ব্যাংক ট্রান্সফার'}</option>
                     </select>
+
+                    {/* bKash / Nagad Payment Box */}
+                    {(paymentMethod === 'bkash' || paymentMethod === 'nagad') && (
+                      <div className="bg-[#F7F4EE] border border-[#0A5C36]/20 rounded-xl p-4 space-y-3 text-sm">
+                        <p className="font-bold text-gray-900">
+                          {paymentMethod === 'bkash'
+                            ? (lang === 'EN' ? 'Pay with bKash' : 'বিকাশে পেমেন্ট করুন')
+                            : (lang === 'EN' ? 'Pay with Nagad' : 'নগদে পেমেন্ট করুন')}
+                        </p>
+                        <p className="text-gray-700">
+                          {lang === 'EN' ? 'Number:' : 'নম্বর:'} <span className="font-extrabold text-[#0A5C36]">01586207756</span>
+                        </p>
+                        <p className="text-gray-700">
+                          {lang === 'EN' ? 'Amount:' : 'পরিমাণ:'} <span className="font-extrabold">{formatTaka(total)}</span>
+                        </p>
+                        <ol className="list-decimal list-inside text-gray-600 space-y-1">
+                          <li>{lang === 'EN' ? 'Open bKash / Nagad app' : 'বিকাশ / নগদ অ্যাপ খুলুন'}</li>
+                          <li>{lang === 'EN' ? 'Select Send Money' : 'সেন্ড মানি সিলেক্ট করুন'}</li>
+                          <li>{lang === 'EN' ? 'Enter the number above' : 'উপরের নম্বরটি দিন'}</li>
+                          <li>{lang === 'EN' ? 'Enter the exact amount' : 'সঠিক পরিমাণ দিন'}</li>
+                          <li>{lang === 'EN' ? 'Complete the payment' : 'পেমেন্ট সম্পন্ন করুন'}</li>
+                        </ol>
+                        <p className="text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs">
+                          {lang === 'EN'
+                            ? '⚠️ Important: After payment, collect the Transaction ID from the confirmation SMS or app history.'
+                            : '⚠️ গুরুত্বপূর্ণ: পেমেন্টের পর কনফার্মেশন SMS বা অ্যাপ হিস্টরি থেকে ট্রানজেকশন আইডি সংগ্রহ করুন।'}
+                        </p>
+
+                        {!showPaymentInfo ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowPaymentInfo(true)}
+                            className="w-full py-2.5 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors"
+                          >
+                            {lang === 'EN' ? 'I have paid' : 'আমি পেমেন্ট করেছি'}
+                          </button>
+                        ) : (
+                          <input
+                            type="text"
+                            value={transactionId}
+                            onChange={(e) => setTransactionId(e.target.value)}
+                            placeholder={lang === 'EN' ? 'Enter Transaction ID *' : 'ট্রানজেকশন আইডি লিখুন *'}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                          />
+                        )}
+                      </div>
+                    )}
+
                     {orderMsg && <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2">{orderMsg}</p>}
-                    <button type="submit" disabled={placingOrder} className="w-full py-3.5 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors disabled:opacity-60">
-                      {placingOrder ? 'Placing Order...' : 'Confirm Order'}
+                    <button
+                      type="submit"
+                      disabled={placingOrder || ((paymentMethod === 'bkash' || paymentMethod === 'nagad') && !showPaymentInfo)}
+                      className="w-full py-3.5 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors disabled:opacity-60"
+                    >
+                      {placingOrder
+                        ? (lang === 'EN' ? 'Placing Order...' : 'অর্ডার করা হচ্ছে...')
+                        : (lang === 'EN' ? 'Confirm Order' : 'অর্ডার নিশ্চিত করুন')}
                     </button>
                   </form>
                 )}
