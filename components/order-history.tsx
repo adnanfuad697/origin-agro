@@ -62,6 +62,28 @@ export default function OrderHistory() {
   const [cancellingId, setCancellingId] = useState<number | null>(null)
   const [confirmOrderId, setConfirmOrderId] = useState<number | null>(null)
 
+  // ===== FIX JUMPING: Lock body scroll when modal is open =====
+  useEffect(() => {
+    if (confirmOrderId !== null) {
+      // Save current scroll position
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      document.body.style.overflow = 'hidden'
+
+      return () => {
+        // Restore scroll position
+        document.body.style.position = ''
+        document.body.style.top = ''
+        document.body.style.width = ''
+        document.body.style.overflow = ''
+        window.scrollTo(0, scrollY)
+      }
+    }
+  }, [confirmOrderId])
+  // ============================================================
+
   async function fetchOrders() {
     setLoading(true)
     const { data: { session } } = await supabase.auth.getSession()
@@ -86,7 +108,6 @@ export default function OrderHistory() {
         paymentStatus: o.payment_status || 'unpaid',
         transactionId: o.transaction_id || null,
         deliveryAddress: o.delivery_address || null,
-        // Fix: treat "pending" as "placed"
         status: o.status === 'pending' ? 'placed' : (o.status || 'placed'),
         createdAt: o.created_at,
       })))
