@@ -86,7 +86,8 @@ export default function OrderHistory() {
         paymentStatus: o.payment_status || 'unpaid',
         transactionId: o.transaction_id || null,
         deliveryAddress: o.delivery_address || null,
-        status: o.status || 'placed',
+        // Fix: treat "pending" as "placed"
+        status: o.status === 'pending' ? 'placed' : (o.status || 'placed'),
         createdAt: o.created_at,
       })))
     }
@@ -111,6 +112,7 @@ export default function OrderHistory() {
     setCancellingId(null)
 
     if (error) {
+      console.error('Cancel error:', error)
       alert(lang === 'EN' ? 'Failed to cancel order. Please try again.' : 'অর্ডার বাতিল করা যায়নি। আবার চেষ্টা করুন।')
     } else {
       fetchOrders()
