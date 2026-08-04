@@ -60,6 +60,7 @@ export default function OrderHistory() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [cancellingId, setCancellingId] = useState<number | null>(null)
+  const [confirmOrderId, setConfirmOrderId] = useState<number | null>(null)
 
   async function fetchOrders() {
     setLoading(true)
@@ -96,19 +97,16 @@ export default function OrderHistory() {
     fetchOrders()
   }, [])
 
-  async function handleCancelOrder(orderId: number) {
-    const confirmMsg = lang === 'EN'
-      ? 'Are you sure you want to cancel this order?'
-      : 'আপনি কি নিশ্চিত যে এই অর্ডার বাতিল করতে চান?'
+  async function confirmCancel() {
+    if (!confirmOrderId) return
 
-    if (!window.confirm(confirmMsg)) return
-
-    setCancellingId(orderId)
+    setCancellingId(confirmOrderId)
+    setConfirmOrderId(null)
 
     const { error } = await supabase
       .from('orders')
       .update({ status: 'cancelled' })
-      .eq('id', orderId)
+      .eq('id', confirmOrderId)
 
     setCancellingId(null)
 
@@ -142,7 +140,40 @@ export default function OrderHistory() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 relative">
+      {/* Custom Confirmation Modal */}
+      {confirmOrderId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
+            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-7 h-7 text-red-500" />
+            </div>
+            <h3 className="text-lg font-extrabold text-gray-900 mb-2">
+              {lang === 'EN' ? 'Cancel this order?' : 'এই অর্ডার বাতিল করবেন?'}
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              {lang === 'EN'
+                ? 'This action cannot be undone. Are you sure you want to cancel?'
+                : 'এই কাজটি আর ফেরানো যাবে না। আপনি কি নিশ্চিত?'}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmOrderId(null)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors"
+              >
+                {lang === 'EN' ? 'Keep Order' : 'রাখুন'}
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm transition-colors"
+              >
+                {lang === 'EN' ? 'Yes, Cancel' : 'হ্যাঁ, বাতিল করুন'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {orders.map((order) => {
         const isCancelled = order.status === 'cancelled'
         const currentStepIndex = trackerSteps.findIndex((s) => s.key === order.status)
@@ -257,10 +288,10 @@ export default function OrderHistory() {
               </div>
             )}
 
-            {/* Cancel Button (only within 24 hours) */}
+            {/* Cancel Button */}
             {canCancel && (
               <button
-                onClick={() => handleCancelOrder(order.id)}
+                onClick={() => setConfirmOrderId(order.id)}
                 disabled={cancellingId === order.id}
                 className="w-full mt-1 py-2 rounded-xl border border-red-300 text-red-600 text-sm font-bold hover:bg-red-50 transition-colors disabled:opacity-60"
               >
