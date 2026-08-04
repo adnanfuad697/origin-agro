@@ -122,10 +122,9 @@ export default function CartPage() {
       router.push('/account')
       return
     }
-
-    const addressSummary = hasMapsLink
-      ? googleMapsLink
-      : `\( {villageOrArea ? villageOrArea + ', ' : ''} \){upazila}, ${district}, ${division}`
+const addressSummary = hasMapsLink
+  ? googleMapsLink
+  : `\( {villageOrArea ? villageOrArea + ', ' : ''} \){upazila}, ${district}, ${division}`
 
     const rows = cart.map((item) => ({
       user_id: session.user.id,
