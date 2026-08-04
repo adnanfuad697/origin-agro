@@ -237,10 +237,26 @@ export default function ProductDetailPage() {
       return
     }
 
-    const addressSummary = hasMapsLink
-      ? googleMapsLink
-      : `\( {villageOrArea ? villageOrArea + ', ' : ''} \){upazila}, ${district}, ${division}`
+    let addressSummary = ''
 
+if (hasMapsLink) {
+  addressSummary = googleMapsLink
+} else {
+  const parts = []
+  if (villageOrArea && villageOrArea.trim()) {
+    parts.push(villageOrArea.trim())
+  }
+  if (upazila && upazila.trim()) {
+    parts.push(upazila.trim())
+  }
+  if (district && district.trim()) {
+    parts.push(district.trim())
+  }
+  if (division && division.trim()) {
+    parts.push(division.trim())
+  }
+  addressSummary = parts.join(', ')
+}
     const { error } = await supabase.from('orders').insert([{
       user_id: session.user.id,
       product_id: product.id,
