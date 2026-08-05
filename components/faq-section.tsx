@@ -117,13 +117,15 @@ export default function FaqSection() {
             {!loading && faqs.length > 3 && (
               <div className="text-center pt-4">
                 <button
-                  onClick={() => setShowAllFaqs(!showAllFaqs)}
-                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
-                >
-                  {showAllFaqs
-                    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
-                    : (lang === 'EN' ? `See More (\( {faqs.length - 3} more)` : `আরও দেখুন ( \){faqs.length - 3}টি আরও)`)}
-                </button>
+  onClick={() => setShowAllFaqs(!showAllFaqs)}
+  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
+>
+  {showAllFaqs
+    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
+    : (lang === 'EN'
+        ? 'See More (' + (faqs.length - 3) + ' more)'
+        : 'আরও দেখুন (' + (faqs.length - 3) + 'টি আরও)')}
+</button>
               </div>
             )}
           </div>
