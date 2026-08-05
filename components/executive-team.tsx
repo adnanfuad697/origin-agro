@@ -14,10 +14,19 @@ function LinkedinIcon() {
     </svg>
   )
 }
+
 function XIcon() {
   return (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
+
+function FacebookIcon() {
+  return (
+    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
     </svg>
   )
 }
@@ -32,6 +41,7 @@ interface TeamMember {
   image: string | null
   linkedin: string | null
   twitter: string | null
+  facebook: string | null
 }
 
 export default function ExecutiveTeam() {
@@ -60,6 +70,7 @@ export default function ExecutiveTeam() {
           image: row.image,
           linkedin: row.linkedin_url,
           twitter: row.twitter_url,
+          facebook: row.facebook_url || null,
         }))
         setTeam(mapped)
       }
@@ -100,13 +111,21 @@ export default function ExecutiveTeam() {
         {!loading && team.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {team.map((member) => (
-              <div key={member.id} className="bg-[#F7F4EE] rounded-2xl p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300 border border-gray-100 group">
+              <div
+                key={member.id}
+                className="bg-[#F7F4EE] rounded-2xl p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300 border border-gray-100 group"
+              >
                 <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-[#0A5C36] shadow-lg mb-5 group-hover:border-[#F26522] transition-colors duration-300">
-                  <Image src={member.image || '/placeholder.jpg'} alt={`Portrait of ${member.name}`} fill className="object-cover" />
+                  <Image
+                    src={member.image || '/placeholder.jpg'}
+                    alt={`Portrait of ${member.name}`}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
 
                 <h3 className="text-xl font-extrabold text-gray-900">{member.name}</h3>
-                
+
                 <p className="text-[#0A5C36] font-semibold text-sm mt-1">
                   {lang === 'EN' ? member.designation : (member.designationBn || member.designation)}
                 </p>
@@ -119,16 +138,39 @@ export default function ExecutiveTeam() {
                   </p>
                 )}
 
-                {(member.linkedin || member.twitter) && (
+                {(member.linkedin || member.twitter || member.facebook) && (
                   <div className="flex items-center gap-3 mt-6">
                     {member.linkedin && (
-                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors" aria-label={`${member.name} LinkedIn`}>
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
+                        aria-label={`${member.name} LinkedIn`}
+                      >
                         <LinkedinIcon />
                       </a>
                     )}
                     {member.twitter && (
-                      <a href={member.twitter} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors" aria-label={`${member.name} X (Twitter)`}>
+                      <a
+                        href={member.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
+                        aria-label={`${member.name} X (Twitter)`}
+                      >
                         <XIcon />
+                      </a>
+                    )}
+                    {member.facebook && (
+                      <a
+                        href={member.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
+                        aria-label={`${member.name} Facebook`}
+                      >
+                        <FacebookIcon />
                       </a>
                     )}
                   </div>
