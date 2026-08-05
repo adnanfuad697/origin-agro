@@ -122,7 +122,7 @@ export default function ExecutiveTeam() {
                   <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-[#0A5C36] shadow-lg mb-5 group-hover:border-[#F26522] transition-colors duration-300">
                     <Image
                       src={member.image || '/placeholder.jpg'}
-                      alt={`Portrait of ${member.name}`}
+                      alt={'Portrait of ' + member.name}
                       fill
                       className="object-cover"
                     />
@@ -149,7 +149,7 @@ export default function ExecutiveTeam() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
-                          aria-label={`${member.name} LinkedIn`}
+                          aria-label={member.name + ' LinkedIn'}
                         >
                           <LinkedinIcon />
                         </a>
@@ -160,7 +160,7 @@ export default function ExecutiveTeam() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
-                          aria-label={`${member.name} X (Twitter)`}
+                          aria-label={member.name + ' X (Twitter)'}
                         >
                           <XIcon />
                         </a>
@@ -171,7 +171,7 @@ export default function ExecutiveTeam() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-9 h-9 bg-[#0A5C36] text-white rounded-full flex items-center justify-center hover:bg-[#F26522] transition-colors"
-                          aria-label={`${member.name} Facebook`}
+                          aria-label={member.name + ' Facebook'}
                         >
                           <FacebookIcon />
                         </a>
@@ -185,15 +185,15 @@ export default function ExecutiveTeam() {
             {team.length > 3 && (
               <div className="text-center mt-10">
                 <button
-  onClick={() => setShowAllTeam(!showAllTeam)}
-  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
->
-  {showAllTeam
-    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
-    : (lang === 'EN'
-        ? 'See More (' + (team.length - 3) + ' more)'
-        : 'আরও দেখুন (' + (team.length - 3) + 'টি আরও)')}
-</button>
+                  onClick={() => setShowAllTeam(!showAllTeam)}
+                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
+                >
+                  {showAllTeam
+                    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
+                    : (lang === 'EN'
+                        ? 'See More (' + (team.length - 3) + ' more)'
+                        : 'আরও দেখুন (' + (team.length - 3) + 'টি আরও)')}
+                </button>
               </div>
             )}
           </>
