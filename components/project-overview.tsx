@@ -76,7 +76,7 @@ export default function ProjectOverview() {
   const selectedProject = projects.find((p) => p.id === selectedId) || projects[0]
 
   return (
-    <section id="projects" className="py-20 bg-[#F7F4EE]">
+    <section id="projects" className="py-12 sm:py-16 lg:py-20 bg-[#F7F4EE]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
