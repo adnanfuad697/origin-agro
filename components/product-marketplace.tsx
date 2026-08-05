@@ -253,14 +253,16 @@ export default function ProductMarketplace() {
 
             {filtered.length > 3 && (
               <div className="text-center mt-8">
-                <button
-                  onClick={() => setShowAllProducts(!showAllProducts)}
-                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
-                >
-                  {showAllProducts
-                    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
-                    : (lang === 'EN' ? `See More (\( {filtered.length - 3} more)` : `আরও দেখুন ( \){filtered.length - 3}টি আরও)`)}
-                </button>
+               <button
+  onClick={() => setShowAllProducts(!showAllProducts)}
+  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
+>
+  {showAllProducts
+    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
+    : (lang === 'EN'
+        ? 'See More (' + (filtered.length - 3) + ' more)'
+        : 'আরও দেখুন (' + (filtered.length - 3) + 'টি আরও)')}
+</button>
               </div>
             )}
           </>
