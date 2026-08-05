@@ -185,13 +185,15 @@ export default function ExecutiveTeam() {
             {team.length > 3 && (
               <div className="text-center mt-10">
                 <button
-                  onClick={() => setShowAllTeam(!showAllTeam)}
-                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
-                >
-                  {showAllTeam
-                    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
-                    : (lang === 'EN' ? `See More (\( {team.length - 3} more)` : `আরও দেখুন ( \){team.length - 3}টি আরও)`)}
-                </button>
+  onClick={() => setShowAllTeam(!showAllTeam)}
+  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
+>
+  {showAllTeam
+    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
+    : (lang === 'EN'
+        ? 'See More (' + (team.length - 3) + ' more)'
+        : 'আরও দেখুন (' + (team.length - 3) + 'টি আরও)')}
+</button>
               </div>
             )}
           </>
