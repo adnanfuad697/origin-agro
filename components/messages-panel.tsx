@@ -16,7 +16,7 @@ export default function MessagesPanel() {
   const [loading, setLoading] = useState(true)
   const [newMessage, setNewMessage] = useState('')
   const [sending, setSending] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   async function fetchMessages() {
     const { data: { session } } = await supabase.auth.getSession()
@@ -48,8 +48,12 @@ export default function MessagesPanel() {
     return () => clearInterval(interval)
   }, [])
 
+  // Scroll only inside the chat box itself — never the page/window
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const el = scrollContainerRef.current
+    if (el) {
+      el.scrollTop = el.scrollHeight
+    }
   }, [messages])
 
   async function handleSend(e: React.FormEvent) {
@@ -89,7 +93,7 @@ export default function MessagesPanel() {
 
   return (
     <div className="flex flex-col h-[420px]">
-      <div className="flex-1 overflow-y-auto space-y-3 mb-3 pr-1">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto space-y-3 mb-3 pr-1">
         {messages.length === 0 && (
           <div className="text-center py-10">
             <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-2" />
@@ -105,7 +109,6 @@ export default function MessagesPanel() {
             </div>
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
 
       <form onSubmit={handleSend} className="flex gap-2">
