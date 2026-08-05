@@ -47,7 +47,7 @@ export default function FaqSection() {
   return (
     <section id="faq" className="py-12 sm:py-16 lg:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <div className="lg:col-span-1">
             <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
               {lang === 'EN' ? 'FAQs' : 'সাধারণ জিজ্ঞাসা'}
