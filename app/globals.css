@@ -95,7 +95,34 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Stronger, cleaner headings */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  /* When language is Bangla → use Bengali font */
+  html[lang="bn"] body,
+  html[lang="bn"] h1,
+  html[lang="bn"] h2,
+  html[lang="bn"] h3,
+  html[lang="bn"] h4,
+  html[lang="bn"] p,
+  html[lang="bn"] span,
+  html[lang="bn"] a,
+  html[lang="bn"] button,
+  html[lang="bn"] li,
+  html[lang="bn"] label,
+  html[lang="bn"] input,
+  html[lang="bn"] textarea,
+  html[lang="bn"] select {
+    font-family: var(--font-bengali), 'Noto Serif Bengali', serif;
   }
 }

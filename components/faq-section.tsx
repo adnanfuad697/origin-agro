@@ -18,6 +18,7 @@ export default function FaqSection() {
   const [faqs, setFaqs] = useState<Faq[]>([])
   const [loading, setLoading] = useState(true)
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [showAllFaqs, setShowAllFaqs] = useState(false)
 
   useEffect(() => {
     async function fetchFaqs() {
@@ -44,10 +45,12 @@ export default function FaqSection() {
     fetchFaqs()
   }, [])
 
+  const visibleFaqs = showAllFaqs ? faqs : faqs.slice(0, 3)
+
   return (
-    <section id="faq" className="py-20 bg-white">
+    <section id="faq" className="py-12 sm:py-16 lg:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <div className="lg:col-span-1">
             <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
               {lang === 'EN' ? 'FAQs' : 'সাধারণ জিজ্ঞাসা'}
@@ -60,7 +63,10 @@ export default function FaqSection() {
                 ? "Have more questions? Reach out to our team directly and we'll get back to you within 24 hours."
                 : 'আরও প্রশ্ন আছে? সরাসরি আমাদের দলের সাথে যোগাযোগ করুন, আমরা ২৪ ঘণ্টার মধ্যে উত্তর দেব।'}
             </p>
-            <a href="#footer" className="inline-block mt-6 bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors duration-200 text-sm">
+            <a
+              href="#footer"
+              className="inline-block mt-6 bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors duration-200 text-sm"
+            >
               {lang === 'EN' ? 'Contact Us' : 'যোগাযোগ করুন'}
             </a>
           </div>
@@ -79,7 +85,7 @@ export default function FaqSection() {
             )}
 
             {!loading &&
-              faqs.map((faq, i) => (
+              visibleFaqs.map((faq, i) => (
                 <div
                   key={faq.id}
                   className={`border rounded-xl overflow-hidden transition-all duration-200 ${
@@ -107,6 +113,21 @@ export default function FaqSection() {
                   )}
                 </div>
               ))}
+
+            {!loading && faqs.length > 3 && (
+              <div className="text-center pt-4">
+                <button
+  onClick={() => setShowAllFaqs(!showAllFaqs)}
+  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
+>
+  {showAllFaqs
+    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
+    : (lang === 'EN'
+        ? 'See More (' + (faqs.length - 3) + ' more)'
+        : 'আরও দেখুন (' + (faqs.length - 3) + 'টি আরও)')}
+</button>
+              </div>
+            )}
           </div>
         </div>
       </div>
