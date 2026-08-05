@@ -8,9 +8,9 @@ export default function TopBar() {
 
   return (
     <div className="bg-[#063D24] text-white text-xs sm:text-sm py-2 px-3 sm:px-4">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-        {/* Contact */}
-        <div className="flex items-center gap-3 sm:gap-5">
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-1.5 gap-x-3">
+        {/* Contact - always visible */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <a
             href="tel:+8801586207756"
             className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors"
@@ -20,10 +20,10 @@ export default function TopBar() {
           </a>
           <a
             href="mailto:originagro0@gmail.com"
-            className="hidden sm:flex items-center gap-1.5 hover:text-[#F26522] transition-colors"
+            className="flex items-center gap-1.5 hover:text-[#F26522] transition-colors"
           >
             <Mail className="w-3.5 h-3.5 shrink-0" />
-            <span>originagro0@gmail.com</span>
+            <span className="break-all">originagro0@gmail.com</span>
           </a>
         </div>
 
@@ -43,7 +43,7 @@ export default function TopBar() {
             className="flex items-center gap-1 hover:text-[#F26522] transition-colors py-1"
           >
             <CircleUserRound className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline sm:inline">
+            <span className="hidden sm:inline">
               {lang === 'EN' ? 'Login/Account' : 'লগইন/অ্যাকাউন্ট'}
             </span>
           </a>
