@@ -65,7 +65,7 @@ export default function ExecutiveTeam() {
   }, [])
 
   return (
-    <section id="team" className="py-20 bg-white">
+    <section id="team" className="py-12 sm:py-16 lg:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
