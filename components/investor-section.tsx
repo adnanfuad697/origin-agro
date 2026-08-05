@@ -125,7 +125,7 @@ export default function InvestorSection() {
   const estimatedTotalPayout = amount + estimatedInvestorShare
 
   return (
-    <section id="invest" className="py-20 bg-white overflow-hidden">
+    <section id="invest" className="py-12 sm:py-16 lg:py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}
