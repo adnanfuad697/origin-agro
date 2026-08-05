@@ -128,7 +128,7 @@ export default function ProductMarketplace() {
   return (
     <section id="shop" className="py-12 sm:py-16 lg:py-20 bg-[#F7F4EE]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
             {lang === 'EN' ? 'Origin Agro Marketplace' : 'অরিজিন অ্যাগ্রো মার্কেটপ্লেস'}
           </p>
@@ -164,7 +164,7 @@ export default function ProductMarketplace() {
         )}
 
         {!loading && !errorMsg && filtered.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {filtered.map((product) => (
               <div
                 key={product.id}
