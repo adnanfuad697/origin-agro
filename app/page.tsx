@@ -8,9 +8,12 @@ import InvestorSection from '@/components/investor-section'
 import ProductMarketplace from '@/components/product-marketplace'
 import FaqSection from '@/components/faq-section'
 import MegaFooter from '@/components/mega-footer'
+import WhatsAppFloat from '@/components/whatsapp-float'
+import MobileBottomBar from '@/components/mobile-bottom-bar'
+
 export default function HomePage() {
   return (
-    <main>
+    <main className="pb-16 lg:pb-0">
       <TopBar />
       <Navbar />
       <HeroSection />
@@ -21,6 +24,8 @@ export default function HomePage() {
       <ExecutiveTeam />
       <FaqSection />
       <MegaFooter />
+      <WhatsAppFloat />
+      <MobileBottomBar />
     </main>
   )
 }
