@@ -22,38 +22,38 @@ import {
 const steps = [
   {
     num: '01',
-    en: 'Register Online',
-    bn: 'অনলাইনে নিবন্ধন করুন',
-    desc: 'Fill out our secure investor registration form with your NID details.',
-    descBn: 'আপনার এনআইডি তথ্য দিয়ে নিরাপদ বিনিয়োগকারী নিবন্ধন ফর্ম পূরণ করুন।',
+    en: 'Choose Your Plan',
+    bn: 'প্ল্যান বেছে নিন',
+    desc: 'Select a Musharakah investment plan that matches your budget and goal.',
+    descBn: 'আপনার বাজেট ও লক্ষ্য অনুযায়ী একটি মুশারাকা বিনিয়োগ প্ল্যান বেছে নিন।',
   },
   {
     num: '02',
-    en: 'Choose Your Plan',
-    bn: 'আপনার প্ল্যান বেছে নিন',
-    desc: 'Select the investment tier that matches your goal and budget.',
-    descBn: 'আপনার লক্ষ্য ও বাজেট অনুযায়ী বিনিয়োগ স্তর বেছে নিন।',
+    en: 'Pick Online or Office',
+    bn: 'অনলাইন বা অফিস বেছে নিন',
+    desc: 'Apply online with the digital form, or book an appointment to visit our office.',
+    descBn: 'ডিজিটাল ফর্ম দিয়ে অনলাইনে আবেদন করুন, অথবা অফিসে এসে দেখা করার জন্য অ্যাপয়েন্টমেন্ট বুক করুন।',
   },
   {
     num: '03',
-    en: 'Sign Agreement',
-    bn: 'চুক্তিতে স্বাক্ষর করুন',
-    desc: 'Receive and sign the Shariah-compliant Musharakah investor agreement.',
-    descBn: 'শরিয়াহ-সম্মত মুশারাকা বিনিয়োগকারী চুক্তি গ্রহণ ও স্বাক্ষর করুন।',
+    en: 'Submit Details / Meet Team',
+    bn: 'তথ্য জমা দিন / টিমের সাথে দেখা করুন',
+    desc: 'Complete the secure investor form (NID & details), or meet our team in person.',
+    descBn: 'নিরাপদ বিনিয়োগকারী ফর্ম পূরণ করুন (এনআইডি ও তথ্য), অথবা সরাসরি আমাদের টিমের সাথে দেখা করুন।',
   },
   {
     num: '04',
-    en: 'Make Payment',
-    bn: 'পেমেন্ট করুন',
-    desc: 'Transfer funds via bKash, Nagad, bank transfer, or our payment portal.',
-    descBn: 'বিকাশ, নগদ, ব্যাংক ট্রান্সফার বা আমাদের পেমেন্ট পোর্টালে পেমেন্ট করুন।',
+    en: 'Sign Agreement & Pay',
+    bn: 'চুক্তি স্বাক্ষর ও পেমেন্ট',
+    desc: 'Sign the Shariah-compliant Musharakah agreement, then pay via bKash, Nagad, or bank.',
+    descBn: 'শরিয়াহ-সম্মত মুশারাকা চুক্তি স্বাক্ষর করুন, তারপর বিকাশ, নগদ বা ব্যাংকের মাধ্যমে পেমেন্ট করুন।',
   },
   {
     num: '05',
-    en: 'Earn Halal Returns',
-    bn: 'হালাল মুনাফা অর্জন করুন',
-    desc: 'Receive your annual profit share directly to your bank account.',
-    descBn: 'আপনার বার্ষিক মুনাফা সরাসরি ব্যাংক অ্যাকাউন্টে পান।',
+    en: 'Receive Profit Share',
+    bn: 'মুনাফার অংশ পান',
+    desc: 'Get your profit share from real business results, as per the agreed Musharakah ratio.',
+    descBn: 'চুক্তিকৃত মুশারাকা অনুপাত অনুযায়ী প্রকৃত ব্যবসায়িক মুনাফা থেকে আপনার অংশ পান।',
   },
 ]
 
@@ -129,7 +129,6 @@ export default function InvestorSection() {
   const estimatedCompanyShare = Math.round(estimatedBusinessProfit * (companySharePct / 100))
   const estimatedTotalPayout = amount + estimatedInvestorShare
 
-  // When plan changes, adjust amount if below that plan's minimum
   function handleSelectPlan(planKey: string) {
     setSelectedPlanKey(planKey)
     const plan = plans.find((p) => p.planKey === planKey)
@@ -321,7 +320,7 @@ export default function InvestorSection() {
           </div>
         )}
 
-        {/* ROI Calculator - Improved for both plans */}
+        {/* Illustrative Profit Calculator */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch mb-20">
           <div className="bg-[#F7F4EE] rounded-2xl p-6 sm:p-8 border border-gray-100">
             <div className="flex items-center gap-3 mb-6">
@@ -339,7 +338,6 @@ export default function InvestorSection() {
             </div>
 
             <div className="space-y-5">
-              {/* Plan selector */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   {lang === 'EN' ? 'Select Plan' : 'প্ল্যান বেছে নিন'}
@@ -349,10 +347,12 @@ export default function InvestorSection() {
                     <button
                       key={plan.planKey}
                       onClick={() => handleSelectPlan(plan.planKey)}
-                      className={'py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ' +
+                      className={
+                        'py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ' +
                         (selectedPlanKey === plan.planKey
                           ? 'bg-[#0A5C36] text-white shadow-md'
-                          : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]')}
+                          : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]')
+                      }
                     >
                       {(lang === 'EN' ? plan.name : (plan.nameBn || plan.name)) +
                         ' — ' +
@@ -366,7 +366,6 @@ export default function InvestorSection() {
                 </div>
               </div>
 
-              {/* Amount slider */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   {lang === 'EN' ? 'Investment Amount (৳)' : 'বিনিয়োগের পরিমাণ (৳)'}
@@ -389,7 +388,6 @@ export default function InvestorSection() {
                 </div>
               </div>
 
-              {/* Selected plan info */}
               {selectedPlan && (
                 <div className="bg-white rounded-xl p-3 border border-gray-200 text-xs text-gray-600 space-y-1">
                   <p>
@@ -414,7 +412,6 @@ export default function InvestorSection() {
               )}
             </div>
 
-            {/* Results */}
             <div className="mt-6 grid grid-cols-2 gap-3">
               <div className="rounded-xl p-3 text-center bg-white border border-gray-200">
                 <p className="text-lg font-extrabold text-[#0A5C36]">
@@ -460,7 +457,6 @@ export default function InvestorSection() {
             </p>
           </div>
 
-          {/* Right image panel */}
           <div className="relative rounded-2xl overflow-hidden min-h-[420px]">
             <Image
               src="/images/investor-bg.png"
@@ -493,21 +489,27 @@ export default function InvestorSection() {
           </div>
         </div>
 
-        {/* How to Invest Steps */}
+        {/* How to Invest - Real Steps (Card Flow) */}
         <div>
           <div className="text-center mb-10">
             <h3 className="text-2xl lg:text-3xl font-extrabold text-gray-900">
               {lang === 'EN' ? 'How to Invest in 5 Steps' : '৫টি সহজ ধাপে বিনিয়োগ শুরু করুন'}
             </h3>
+            <p className="text-gray-500 text-sm mt-2 max-w-xl mx-auto">
+              {lang === 'EN'
+                ? 'Your real Musharakah journey on Origin Agro — from choosing a plan to receiving profit share.'
+                : 'অরিজিন অ্যাগ্রোতে আপনার প্রকৃত মুশারাকা যাত্রা — প্ল্যান বেছে নেওয়া থেকে মুনাফার অংশ পাওয়া পর্যন্ত।'}
+            </p>
           </div>
-          <div className="relative">
-            <div className="hidden lg:block absolute top-8 left-[10%] right-[10%] h-0.5 bg-gray-200 z-0" />
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6 relative z-10">
-              {steps.map((step, i) => (
-                <div key={step.num} className="flex flex-col items-center text-center gap-3">
+
+          {/* Mobile vertical flow */}
+          <div className="flex flex-col gap-4 lg:hidden">
+            {steps.map((step, i) => (
+              <div key={step.num} className="relative">
+                <div className="bg-[#F7F4EE] border border-gray-100 rounded-2xl p-5 flex gap-4 items-start">
                   <div
                     className={
-                      'w-16 h-16 rounded-full flex items-center justify-center font-extrabold text-lg shadow-lg shrink-0 ' +
+                      'w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-base shrink-0 ' +
                       (i === 4 ? 'bg-[#F26522] text-white' : 'bg-[#0A5C36] text-white')
                     }
                   >
@@ -517,13 +519,49 @@ export default function InvestorSection() {
                     <p className="font-extrabold text-gray-900 text-sm">
                       {lang === 'EN' ? step.en : step.bn}
                     </p>
-                    <p className="text-gray-500 text-xs mt-1.5 leading-relaxed">
+                    <p className="text-gray-500 text-xs mt-1 leading-relaxed">
                       {lang === 'EN' ? step.desc : step.descBn}
                     </p>
                   </div>
                 </div>
-              ))}
-            </div>
+                {i < steps.length - 1 && (
+                  <div className="flex justify-center py-1">
+                    <div className="w-0.5 h-4 bg-[#0A5C36]/30" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop horizontal flow cards */}
+          <div className="hidden lg:grid grid-cols-5 gap-4">
+            {steps.map((step, i) => (
+              <div key={step.num} className="relative">
+                <div className="bg-[#F7F4EE] border border-gray-100 rounded-2xl p-5 h-full flex flex-col hover:shadow-md transition-shadow">
+                  <div
+                    className={
+                      'w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-base mb-4 ' +
+                      (i === 4 ? 'bg-[#F26522] text-white' : 'bg-[#0A5C36] text-white')
+                    }
+                  >
+                    {step.num}
+                  </div>
+                  <p className="font-extrabold text-gray-900 text-sm mb-2">
+                    {lang === 'EN' ? step.en : step.bn}
+                  </p>
+                  <p className="text-gray-500 text-xs leading-relaxed flex-1">
+                    {lang === 'EN' ? step.desc : step.descBn}
+                  </p>
+                </div>
+                {i < steps.length - 1 && (
+                  <div className="absolute top-1/2 -right-3 z-10 -translate-y-1/2">
+                    <div className="w-6 h-6 rounded-full bg-white border border-[#0A5C36]/20 flex items-center justify-center shadow-sm">
+                      <ArrowRight className="w-3.5 h-3.5 text-[#0A5C36]" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
