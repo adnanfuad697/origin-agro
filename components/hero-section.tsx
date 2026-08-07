@@ -45,7 +45,7 @@ export default function HeroSection() {
               <p className="text-gray-500 text-xs sm:text-sm italic mt-0.5">
                 {lang === 'EN'
                   ? 'Cultivating Nature, Nourishing Lives'
-                  : 'প্রকৃতিকে লালন, জীবনকে পুষ্টি'}
+                  : 'প্রকৃতিকে বাঁচাই, জীবনকে গড়ি'}
               </p>
             </div>
 
