@@ -37,9 +37,21 @@ export default function HeroSection() {
               </h1>
             )}
 
+            {/* Motto - light and elegant */}
+            <div className="-mt-1">
+              <p className="text-[#0A5C36] font-bold text-base sm:text-lg tracking-wide">
+                {lang === 'EN' ? 'Anybody Can Agriculture' : 'কৃষি সবার জন্য'}
+              </p>
+              <p className="text-gray-500 text-xs sm:text-sm italic mt-0.5">
+                {lang === 'EN'
+                  ? 'Cultivating Nature, Nourishing Lives'
+                  : 'প্রকৃতিকে লালন, জীবনকে পুষ্টি'}
+              </p>
+            </div>
+
             <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
               {lang === 'EN'
-                ? 'Organic farming, halah livestock, and Shariah-guided investment — all in one place.'
+                ? 'Organic farming, halal livestock, and Shariah-guided investment — all in one place.'
                 : 'জৈব কৃষি, হালাল পশুপালন এবং শরিয়াহ-নির্দেশিত বিনিয়োগ — সব এক জায়গায়।'}
             </p>
 
@@ -115,7 +127,6 @@ export default function HeroSection() {
               />
             </div>
 
-            {/* Decorative elements */}
             <div className="absolute -top-4 -right-4 w-20 h-20 sm:w-24 sm:h-24 bg-[#F26522]/10 rounded-full -z-10" />
             <div className="absolute -bottom-6 -left-6 w-28 h-28 sm:w-36 sm:h-36 bg-[#0A5C36]/10 rounded-full -z-10" />
           </div>
