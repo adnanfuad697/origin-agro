@@ -39,7 +39,7 @@ export default function HeroSection() {
 
             {/* Motto - light and elegant */}
             <div className="-mt-1">
-              <p className="text-[#0A5C36] font-bold text-base sm:text-lg tracking-wide">
+              <p className="text-[#F26522] font-bold text-base sm:text-lg tracking-wide">
                 {lang === 'EN' ? 'Anybody Can Agriculture' : 'কৃষি সবার জন্য'}
               </p>
               <p className="text-gray-500 text-xs sm:text-sm italic mt-0.5">
