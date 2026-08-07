@@ -110,6 +110,7 @@ export default function InvestorSection() {
         if (mapped.length > 0) {
           setSelectedPlanKey(mapped[0].planKey)
           setChosenPlanKey(mapped[0].planKey)
+          if (mapped[0].minAmount) setAmount(mapped[0].minAmount)
         }
       }
       setPlansLoading(false)
@@ -118,11 +119,24 @@ export default function InvestorSection() {
   }, [])
 
   const selectedPlan = plans.find((p) => p.planKey === selectedPlanKey) || plans[0]
+  const minAmount = selectedPlan?.minAmount || 50000
   const illustrativeRate = selectedPlan?.illustrativeProfitRate ?? 0
   const investorSharePct = selectedPlan?.investorSharePct ?? 0
+  const companySharePct = selectedPlan?.companySharePct ?? 0
+
   const estimatedBusinessProfit = Math.round(amount * (illustrativeRate / 100))
   const estimatedInvestorShare = Math.round(estimatedBusinessProfit * (investorSharePct / 100))
+  const estimatedCompanyShare = Math.round(estimatedBusinessProfit * (companySharePct / 100))
   const estimatedTotalPayout = amount + estimatedInvestorShare
+
+  // When plan changes, adjust amount if below that plan's minimum
+  function handleSelectPlan(planKey: string) {
+    setSelectedPlanKey(planKey)
+    const plan = plans.find((p) => p.planKey === planKey)
+    if (plan?.minAmount && amount < plan.minAmount) {
+      setAmount(plan.minAmount)
+    }
+  }
 
   return (
     <section id="invest" className="py-12 sm:py-16 lg:py-20 bg-white overflow-hidden">
@@ -147,7 +161,7 @@ export default function InvestorSection() {
           </p>
         </div>
 
-        {/* Trust Badges Row */}
+        {/* Trust Badges */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {[
             { icon: ShieldCheck, en: 'Shariah-Guided Model', bn: 'শরিয়াহ-নির্দেশিত মডেল', val: 'Musharakah' },
@@ -307,37 +321,67 @@ export default function InvestorSection() {
           </div>
         )}
 
-        {/* ROI Calculator */}
+        {/* ROI Calculator - Improved for both plans */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch mb-20">
-          {/* Left: calculator */}
-          <div className="bg-[#F7F4EE] rounded-2xl p-8 border border-gray-100">
+          <div className="bg-[#F7F4EE] rounded-2xl p-6 sm:p-8 border border-gray-100">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-[#0A5C36] rounded-xl flex items-center justify-center">
                 <CircleDollarSign className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h3 className="font-extrabold text-gray-900 text-lg">
-                  {lang === 'EN' ? 'ROI Calculator' : 'বিনিয়োগ রিটার্ন ক্যালকুলেটর'}
+                  {lang === 'EN' ? 'Illustrative Profit Calculator' : 'উদাহরণমূলক মুনাফা ক্যালকুলেটর'}
                 </h3>
+                <p className="text-xs text-gray-500">
+                  {lang === 'EN' ? 'Based on Musharakah profit-sharing' : 'মুশারাকা মুনাফা ভাগাভাগির ভিত্তিতে'}
+                </p>
               </div>
             </div>
 
             <div className="space-y-5">
+              {/* Plan selector */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  {lang === 'EN' ? 'Select Plan' : 'প্ল্যান বেছে নিন'}
+                </label>
+                <div className="flex flex-col gap-2">
+                  {plans.map((plan) => (
+                    <button
+                      key={plan.planKey}
+                      onClick={() => handleSelectPlan(plan.planKey)}
+                      className={'py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ' +
+                        (selectedPlanKey === plan.planKey
+                          ? 'bg-[#0A5C36] text-white shadow-md'
+                          : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]')}
+                    >
+                      {(lang === 'EN' ? plan.name : (plan.nameBn || plan.name)) +
+                        ' — ' +
+                        (lang === 'EN' ? plan.tenure : (plan.tenureBn || plan.tenure)) +
+                        ' | ' +
+                        plan.companySharePct +
+                        ':' +
+                        plan.investorSharePct}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Amount slider */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   {lang === 'EN' ? 'Investment Amount (৳)' : 'বিনিয়োগের পরিমাণ (৳)'}
                 </label>
                 <input
                   type="range"
-                  min={50000}
+                  min={minAmount}
                   max={1000000}
-                  step={50000}
-                  value={amount}
+                  step={10000}
+                  value={amount < minAmount ? minAmount : amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0A5C36]"
                 />
                 <div className="flex justify-between mt-1 text-xs text-gray-500">
-                  <span>৳ 50,000</span>
+                  <span>৳ {minAmount.toLocaleString('en-IN')}</span>
                   <span className="font-extrabold text-[#0A5C36] text-base">
                     ৳ {amount.toLocaleString('en-IN')}
                   </span>
@@ -345,68 +389,78 @@ export default function InvestorSection() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  {lang === 'EN' ? 'Choose Plan' : 'প্ল্যান বেছে নিন'}
-                </label>
-                <div className="flex flex-col gap-2">
-                  {plans.map((plan) => (
-                    <button
-                      key={plan.planKey}
-                      onClick={() => setSelectedPlanKey(plan.planKey)}
-                      className={`py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ${
-                        selectedPlanKey === plan.planKey
-                          ? 'bg-[#0A5C36] text-white shadow-md'
-                          : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]'
-                      }`}
-                    >
-                      {lang === 'EN' ? plan.name : (plan.nameBn || plan.name)} — {lang === 'EN' ? plan.tenure : (plan.tenureBn || plan.tenure)}
-                    </button>
-                  ))}
+              {/* Selected plan info */}
+              {selectedPlan && (
+                <div className="bg-white rounded-xl p-3 border border-gray-200 text-xs text-gray-600 space-y-1">
+                  <p>
+                    <span className="font-bold text-gray-800">
+                      {lang === 'EN' ? 'Plan:' : 'প্ল্যান:'}
+                    </span>{' '}
+                    {lang === 'EN' ? selectedPlan.name : (selectedPlan.nameBn || selectedPlan.name)}
+                  </p>
+                  <p>
+                    <span className="font-bold text-gray-800">
+                      {lang === 'EN' ? 'Illustrative profit rate:' : 'উদাহরণমূলক মুনাফার হার:'}
+                    </span>{' '}
+                    {illustrativeRate}%
+                  </p>
+                  <p>
+                    <span className="font-bold text-gray-800">
+                      {lang === 'EN' ? 'Profit split (Company:Investor):' : 'মুনাফা ভাগ (কোম্পানি:বিনিয়োগকারী):'}
+                    </span>{' '}
+                    {companySharePct}:{investorSharePct}
+                  </p>
                 </div>
+              )}
+            </div>
+
+            {/* Results */}
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="rounded-xl p-3 text-center bg-white border border-gray-200">
+                <p className="text-lg font-extrabold text-[#0A5C36]">
+                  ৳ {estimatedBusinessProfit.toLocaleString('en-IN')}
+                </p>
+                <p className="text-xs mt-1 text-gray-500 leading-snug">
+                  {lang === 'EN' ? 'Est. Business Profit' : 'আনুমানিক ব্যবসায়িক মুনাফা'}
+                </p>
+              </div>
+
+              <div className="rounded-xl p-3 text-center bg-[#0A5C36] text-white">
+                <p className="text-lg font-extrabold text-white">
+                  ৳ {estimatedInvestorShare.toLocaleString('en-IN')}
+                </p>
+                <p className="text-xs mt-1 text-white/70 leading-snug">
+                  {lang === 'EN' ? 'Your Profit Share' : 'আপনার মুনাফার অংশ'}
+                </p>
+              </div>
+
+              <div className="rounded-xl p-3 text-center bg-white border border-gray-200">
+                <p className="text-lg font-extrabold text-gray-700">
+                  ৳ {estimatedCompanyShare.toLocaleString('en-IN')}
+                </p>
+                <p className="text-xs mt-1 text-gray-500 leading-snug">
+                  {lang === 'EN' ? 'Company Profit Share' : 'কোম্পানির মুনাফার অংশ'}
+                </p>
+              </div>
+
+              <div className="rounded-xl p-3 text-center bg-white border border-gray-200">
+                <p className="text-lg font-extrabold text-[#F26522]">
+                  ৳ {estimatedTotalPayout.toLocaleString('en-IN')}
+                </p>
+                <p className="text-xs mt-1 text-gray-500 leading-snug">
+                  {lang === 'EN' ? 'Est. Total Payout' : 'আনুমানিক মোট প্রাপ্তি'}
+                </p>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              {[
-                {
-                  label: lang === 'EN' ? 'Est. Business Profit' : 'আনুমানিক ব্যবসায়িক মুনাফা',
-                  value: `৳ ${estimatedBusinessProfit.toLocaleString('en-IN')}`,
-                  highlight: false,
-                },
-                {
-                  label: lang === 'EN' ? 'Your Est. Share' : 'আপনার আনুমানিক অংশ',
-                  value: `৳ ${estimatedInvestorShare.toLocaleString('en-IN')}`,
-                  highlight: true,
-                },
-                {
-                  label: lang === 'EN' ? 'Est. Total Payout' : 'আনুমানিক মোট প্রাপ্তি',
-                  value: `৳ ${estimatedTotalPayout.toLocaleString('en-IN')}`,
-                  highlight: false,
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className={`rounded-xl p-3 text-center ${item.highlight ? 'bg-[#0A5C36] text-white' : 'bg-white border border-gray-200'}`}
-                >
-                  <p className={`text-lg font-extrabold ${item.highlight ? 'text-white' : 'text-[#0A5C36]'}`}>
-                    {item.value}
-                  </p>
-                  <p className={`text-xs mt-1 leading-snug ${item.highlight ? 'text-white/70' : 'text-gray-500'}`}>
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-xs text-gray-400 mt-4">
+            <p className="text-xs text-gray-400 mt-4 leading-relaxed">
               {lang === 'EN'
-                ? '* This is an illustrative estimate only, based on an assumed business profit scenario — it is NOT a guaranteed or fixed return. Under the Musharakah agreement, your actual profit share depends entirely on the real business outcome of that cycle, and your capital may reduce proportionally in the event of a genuine loss.'
-                : '* এটি শুধুমাত্র একটি উদাহরণমূলক অনুমান, অনুমানিত ব্যবসায়িক মুনাফার উপর ভিত্তি করে — এটি কোনো নিশ্চিত বা নির্দিষ্ট রিটার্ন নয়। মুশারাকা চুক্তি অনুযায়ী, আপনার প্রকৃত মুনাফার অংশ সেই চক্রের প্রকৃত ব্যবসায়িক ফলাফলের উপর নির্ভর করে, এবং প্রকৃত লোকসানের ক্ষেত্রে আপনার মূলধন সমানুপাতিকভাবে হ্রাস পেতে পারে।'}
+                ? '* Illustrative estimate only — not a guaranteed or fixed return. Under Musharakah, actual profit depends on real business results. In case of genuine loss, capital is reduced proportionally according to investment share.'
+                : '* শুধুমাত্র উদাহরণমূলক অনুমান — নিশ্চিত বা নির্দিষ্ট রিটার্ন নয়। মুশারাকা অনুযায়ী প্রকৃত মুনাফা ব্যবসায়িক ফলাফলের উপর নির্ভর করে। প্রকৃত লোকসানে মূলধন বিনিয়োগের অংশ অনুসারে সমানুপাতিকভাবে হ্রাস পায়।'}
             </p>
           </div>
 
-          {/* Right: background image + steps */}
+          {/* Right image panel */}
           <div className="relative rounded-2xl overflow-hidden min-h-[420px]">
             <Image
               src="/images/investor-bg.png"
@@ -452,9 +506,10 @@ export default function InvestorSection() {
               {steps.map((step, i) => (
                 <div key={step.num} className="flex flex-col items-center text-center gap-3">
                   <div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center font-extrabold text-lg shadow-lg shrink-0 ${
-                      i === 4 ? 'bg-[#F26522] text-white' : 'bg-[#0A5C36] text-white'
-                    }`}
+                    className={
+                      'w-16 h-16 rounded-full flex items-center justify-center font-extrabold text-lg shadow-lg shrink-0 ' +
+                      (i === 4 ? 'bg-[#F26522] text-white' : 'bg-[#0A5C36] text-white')
+                    }
                   >
                     {step.num}
                   </div>
