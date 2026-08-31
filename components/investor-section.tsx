@@ -17,43 +17,47 @@ import {
   Calendar,
   FileText,
   CheckCircle2,
+  AlertTriangle,
+  Clock,
+  Scale,
+  HandCoins,
 } from 'lucide-react'
 
 const steps = [
   {
     num: '01',
-    en: 'Choose Your Plan',
-    bn: 'প্ল্যান বেছে নিন',
-    desc: 'Select a Musharakah investment plan that matches your budget and goal.',
-    descBn: 'আপনার বাজেট ও লক্ষ্য অনুযায়ী একটি মুশারাকা বিনিয়োগ প্ল্যান বেছে নিন।',
+    en: 'Choose to Invest',
+    bn: 'বিনিয়োগে সম্মত হন',
+    desc: 'Review the Musharaka terms, minimum 2-year tenure, and project details.',
+    descBn: 'মুশারাকা শর্ত, ন্যূনতম ২ বছরের মেয়াদ ও প্রকল্পের বিবরণ দেখে নিন।',
   },
   {
     num: '02',
-    en: 'Pick Online or Office',
-    bn: 'অনলাইন বা অফিস বেছে নিন',
-    desc: 'Apply online with the digital form, or book an appointment to visit our office.',
-    descBn: 'ডিজিটাল ফর্ম দিয়ে অনলাইনে আবেদন করুন, অথবা অফিসে এসে দেখা করার জন্য অ্যাপয়েন্টমেন্ট বুক করুন।',
+    en: 'Apply Online or Visit Office',
+    bn: 'অনলাইন বা অফিসে আবেদন',
+    desc: 'Submit the secure form online, or book an appointment to meet our team.',
+    descBn: 'নিরাপদ ফর্ম অনলাইনে জমা দিন, অথবা টিমের সাথে দেখা করতে অ্যাপয়েন্টমেন্ট বুক করুন।',
   },
   {
     num: '03',
-    en: 'Submit Details / Meet Team',
-    bn: 'তথ্য জমা দিন / টিমের সাথে দেখা করুন',
-    desc: 'Complete the secure investor form (NID & details), or meet our team in person.',
-    descBn: 'নিরাপদ বিনিয়োগকারী ফর্ম পূরণ করুন (এনআইডি ও তথ্য), অথবা সরাসরি আমাদের টিমের সাথে দেখা করুন।',
+    en: 'Sign Musharaka Agreement',
+    bn: 'মুশারাকা চুক্তি স্বাক্ষর',
+    desc: 'Sign the Shariah-based Musharaka agreement with agreed capital and profit ratio.',
+    descBn: 'সম্মত মূলধন ও মুনাফা অনুপাতসহ শরিয়াহভিত্তিক মুশারাকা চুক্তি স্বাক্ষর করুন।',
   },
   {
     num: '04',
-    en: 'Sign Agreement & Pay',
-    bn: 'চুক্তি স্বাক্ষর ও পেমেন্ট',
-    desc: 'Sign the Shariah-compliant Musharakah agreement, then pay via bKash, Nagad, or bank.',
-    descBn: 'শরিয়াহ-সম্মত মুশারাকা চুক্তি স্বাক্ষর করুন, তারপর বিকাশ, নগদ বা ব্যাংকের মাধ্যমে পেমেন্ট করুন।',
+    en: 'Deploy Capital & Get Reports',
+    bn: 'মূলধন ব্যবহার ও প্রতিবেদন',
+    desc: 'Funds go only to approved farm & food operations. You receive reports every 6 months.',
+    descBn: 'অর্থ শুধু অনুমোদিত খামার ও খাদ্য কার্যক্রমে ব্যবহৃত হয়। প্রতি ৬ মাসে প্রতিবেদন পাবেন।',
   },
   {
     num: '05',
-    en: 'Receive Profit Share',
-    bn: 'মুনাফার অংশ পান',
-    desc: 'Get your profit share from real business results, as per the agreed Musharakah ratio.',
-    descBn: 'চুক্তিকৃত মুশারাকা অনুপাত অনুযায়ী প্রকৃত ব্যবসায়িক মুনাফা থেকে আপনার অংশ পান।',
+    en: 'Profit Share / Settlement',
+    bn: 'মুনাফা ভাগ / নিষ্পত্তি',
+    desc: 'Profit (if any) is shared per ratio up to 4 times in 2 years. At maturity, settlement by actual results.',
+    descBn: 'মুনাফা থাকলে অনুপাত অনুযায়ী ২ বছরে সর্বোচ্চ ৪ বার ভাগ। মেয়াদ শেষে প্রকৃত ফলাফল অনুযায়ী নিষ্পত্তি।',
   },
 ]
 
@@ -74,7 +78,7 @@ interface InvestmentPlan {
 
 export default function InvestorSection() {
   const { lang } = useLanguage()
-  const [amount, setAmount] = useState(50000)
+  const [amount, setAmount] = useState(20000)
   const [selectedPlanKey, setSelectedPlanKey] = useState('')
   const [chosenPlanKey, setChosenPlanKey] = useState('')
   const [investMethod, setInvestMethod] = useState<'online' | 'physical' | null>(null)
@@ -104,7 +108,9 @@ export default function InvestorSection() {
           minAmount: row.min_amount ? Number(row.min_amount) : null,
           companySharePct: row.company_share_pct ? Number(row.company_share_pct) : null,
           investorSharePct: row.investor_share_pct ? Number(row.investor_share_pct) : null,
-          illustrativeProfitRate: row.illustrative_profit_rate ? Number(row.illustrative_profit_rate) : null,
+          illustrativeProfitRate: row.illustrative_profit_rate
+            ? Number(row.illustrative_profit_rate)
+            : null,
         }))
         setPlans(mapped)
         if (mapped.length > 0) {
@@ -119,10 +125,10 @@ export default function InvestorSection() {
   }, [])
 
   const selectedPlan = plans.find((p) => p.planKey === selectedPlanKey) || plans[0]
-  const minAmount = selectedPlan?.minAmount || 50000
+  const minAmount = selectedPlan?.minAmount || 20000
   const illustrativeRate = selectedPlan?.illustrativeProfitRate ?? 0
-  const investorSharePct = selectedPlan?.investorSharePct ?? 0
-  const companySharePct = selectedPlan?.companySharePct ?? 0
+  const investorSharePct = selectedPlan?.investorSharePct ?? 40
+  const companySharePct = selectedPlan?.companySharePct ?? 60
 
   const estimatedBusinessProfit = Math.round(amount * (illustrativeRate / 100))
   const estimatedInvestorShare = Math.round(estimatedBusinessProfit * (investorSharePct / 100))
@@ -140,79 +146,230 @@ export default function InvestorSection() {
   return (
     <section id="invest" className="py-12 sm:py-16 lg:py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Section Header */}
-        <div className="text-center mb-16">
+        {/* Header */}
+        <div className="text-center mb-12 sm:mb-16">
           <p className="text-[#F26522] font-semibold text-sm uppercase tracking-widest mb-2">
-            {lang === 'EN' ? 'Smart Investment' : 'স্মার্ট বিনিয়োগ'}
+            {lang === 'EN' ? 'Shariah-Aligned Investment' : 'শরিয়াহসম্মত বিনিয়োগ'}
           </p>
           <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold text-gray-900 text-balance mb-4">
             {lang === 'EN' ? (
-              <>Invest Smart. <span className="text-[#0A5C36]">Earn Halal.</span></>
+              <>
+                Project <span className="text-[#0A5C36]">Musharaka</span>
+              </>
             ) : (
-              <>স্মার্ট বিনিয়োগ করুন। <span className="text-[#0A5C36]">হালাল মুনাফা অর্জন করুন।</span></>
+              <>
+                প্রজেক্ট <span className="text-[#0A5C36]">মুশারাকা</span>
+              </>
             )}
           </h2>
           <p className="text-gray-500 text-base max-w-2xl mx-auto leading-relaxed">
             {lang === 'EN'
-              ? "Join Bangladesh's transparent, Shariah-guided agro-investment partnership model."
-              : 'বাংলাদেশের একটি স্বচ্ছ, শরিয়াহ-নির্দেশিত কৃষি বিনিয়োগ পার্টনারশিপ মডেলে যোগ দিন।'}
+              ? 'A transparent profit-and-loss sharing partnership in Origin Agro’s farm-to-food business — not a fixed deposit, not a guaranteed return.'
+              : 'অরিজিন অ্যাগ্রোর ফার্ম-টু-ফুড ব্যবসায় স্বচ্ছ মুনাফা-লোকসান ভাগাভাগির অংশীদারিত্ব — নির্দিষ্ট আমানত নয়, গ্যারান্টিযুক্ত রিটার্ন নয়।'}
           </p>
         </div>
 
-        {/* Trust Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+        {/* Investment Snapshot */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-12 sm:mb-16">
           {[
-            { icon: ShieldCheck, en: 'Shariah-Guided Model', bn: 'শরিয়াহ-নির্দেশিত মডেল', val: 'Musharakah' },
-            { icon: Users, en: 'Investment Model', bn: 'বিনিয়োগ মডেল', val: 'Partnership' },
-            { icon: TrendingUp, en: 'Profit Structure', bn: 'মুনাফা কাঠামো', val: 'Profit & Loss Share' },
-            { icon: BadgeCheck, en: 'Transparent Terms', bn: 'স্বচ্ছ শর্তাবলী', val: '100%' },
-          ].map(({ icon: Icon, en, bn, val }) => (
-            <div key={en} className="bg-[#F7F4EE] rounded-2xl p-5 flex flex-col items-center text-center gap-2 border border-gray-100 hover:border-[#0A5C36]/30 hover:shadow-md transition-all duration-200">
-              <div className="w-11 h-11 bg-[#0A5C36] rounded-xl flex items-center justify-center">
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-              <p className="text-2xl font-extrabold text-[#0A5C36]">{val}</p>
-              <p className="font-bold text-gray-800 text-sm">{lang === 'EN' ? en : bn}</p>
+            {
+              en: 'Structure',
+              bn: 'কাঠামো',
+              val: lang === 'EN' ? 'Musharaka' : 'মুশারাকা',
+            },
+            {
+              en: 'Min. Ticket',
+              bn: 'ন্যূনতম',
+              val: '৳ 20,000',
+            },
+            {
+              en: 'Capital Target',
+              bn: 'লক্ষ্য মূলধন',
+              val: '৳ 3,50,000',
+            },
+            {
+              en: 'Min. Tenure',
+              bn: 'ন্যূনতম মেয়াদ',
+              val: lang === 'EN' ? '2 Years' : '২ বছর',
+            },
+            {
+              en: 'Profit Cycle',
+              bn: 'মুনাফা চক্র',
+              val: lang === 'EN' ? 'Every 6 Months' : 'প্রতি ৬ মাস',
+            },
+            {
+              en: 'Location',
+              bn: 'অবস্থান',
+              val: 'Gazipur',
+            },
+          ].map((item) => (
+            <div
+              key={item.en}
+              className="bg-[#F7F4EE] rounded-2xl p-4 text-center border border-gray-100"
+            >
+              <p className="text-sm sm:text-base font-extrabold text-[#0A5C36] leading-tight">
+                {item.val}
+              </p>
+              <p className="text-[11px] sm:text-xs text-gray-500 mt-1 font-medium">
+                {lang === 'EN' ? item.en : item.bn}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Investment Plans */}
+        {/* What is Musharaka + Key Terms */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-16">
+          <div className="bg-[#F7F4EE] rounded-2xl p-6 sm:p-8 border border-gray-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-[#0A5C36] rounded-xl flex items-center justify-center">
+                <Scale className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-extrabold text-gray-900 text-lg">
+                {lang === 'EN' ? 'What is Musharaka?' : 'মুশারাকা কী?'}
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              {lang === 'EN'
+                ? 'Musharaka is a partnership where both parties contribute capital (and Origin Agro also contributes management, assets and operations). Profit is shared by a pre-agreed ratio. Genuine business loss is shared by capital contribution ratio.'
+                : 'মুশারাকা হলো অংশীদারিত্ব যেখানে উভয় পক্ষ মূলধন দেয় (অরিজিন অ্যাগ্রো ব্যবস্থাপনা, সম্পদ ও পরিচালনাও দেয়)। মুনাফা পূর্বনির্ধারিত অনুপাতে ভাগ হয়। প্রকৃত ব্যবসায়িক ক্ষতি মূলধন অবদানের অনুপাতে বহন হয়।'}
+            </p>
+            <ul className="space-y-2 text-sm text-gray-700">
+              {(lang === 'EN'
+                ? [
+                    'Profit is not fixed or guaranteed',
+                    'Loss follows capital ratio (except fraud / negligence)',
+                    'No automatic permanent company share ownership',
+                    'Funds used only in approved Origin Agro operations',
+                  ]
+                : [
+                    'মুনাফা নির্দিষ্ট বা গ্যারান্টিযুক্ত নয়',
+                    'ক্ষতি মূলধন অনুপাতে (প্রতারণা/অবহেলা ছাড়া)',
+                    'স্বয়ংক্রিয় স্থায়ী কোম্পানি শেয়ার মালিকানা নয়',
+                    'অর্থ শুধু অনুমোদিত Origin Agro কার্যক্রমে',
+                  ]
+              ).map((t) => (
+                <li key={t} className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#0A5C36] shrink-0 mt-0.5" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-[#0A5C36]/15">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-[#F26522] rounded-xl flex items-center justify-center">
+                <HandCoins className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-extrabold text-gray-900 text-lg">
+                {lang === 'EN' ? 'Profit, Tenure & Exit' : 'মুনাফা, মেয়াদ ও প্রস্থান'}
+              </h3>
+            </div>
+            <div className="space-y-4 text-sm text-gray-700">
+              <div className="flex gap-3">
+                <Clock className="w-4 h-4 text-[#0A5C36] shrink-0 mt-0.5" />
+                <p>
+                  {lang === 'EN'
+                    ? 'Minimum tenure: 2 years. Profit account & distribution every 6 months (up to 4 cycles).'
+                    : 'ন্যূনতম মেয়াদ: ২ বছর। মুনাফা হিসাব ও বিতরণ প্রতি ৬ মাস অন্তর (সর্বোচ্চ ৪ পর্ব)।'}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <TrendingUp className="w-4 h-4 text-[#0A5C36] shrink-0 mt-0.5" />
+                <p>
+                  {lang === 'EN'
+                    ? 'Proposed starting profit split (subject to final agreement): Investor pool 40% · Origin Agro 60% of distributable net profit.'
+                    : 'প্রস্তাবিত মুনাফা ভাগ (চূড়ান্ত চুক্তি সাপেক্ষ): বিনিয়োগকারী পুল ৪০% · অরিজিন অ্যাগ্রো ৬০% বণ্টনযোগ্য নিট মুনাফার।'}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <FileText className="w-4 h-4 text-[#0A5C36] shrink-0 mt-0.5" />
+                <p>
+                  {lang === 'EN'
+                    ? 'Early exit: minimum 3 months written notice. Settlement by actual project position — not a guaranteed capital return promise.'
+                    : 'আগাম প্রস্থান: কমপক্ষে ৩ মাস আগে লিখিত নোটিশ। নিষ্পত্তি প্রকৃত প্রকল্প অবস্থান অনুযায়ী — গ্যারান্টিযুক্ত মূলধন ফেরতের প্রতিশ্রুতি নয়।'}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <BarChart3 className="w-4 h-4 text-[#0A5C36] shrink-0 mt-0.5" />
+                <p>
+                  {lang === 'EN'
+                    ? 'Every 6 months you receive a project report: income/expense summary, production & sales, profit/loss, fund use, and next plan.'
+                    : 'প্রতি ৬ মাসে প্রকল্প প্রতিবেদন: আয়-ব্যয় সারসংক্ষেপ, উৎপাদন ও বিক্রয়, মুনাফা/ক্ষতি, অর্থের ব্যবহার ও পরবর্তী পরিকল্পনা।'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Risk notice */}
+        <div className="mb-16 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-900 leading-relaxed">
+            {lang === 'EN'
+              ? 'Agriculture and livestock projects carry market, disease, weather and operational risks. Origin Agro does not guarantee any fixed profit or capital preservation. You participate in the actual economic outcome of the project under a signed Musharaka agreement. Final terms are subject to Shariah, legal and accounting review.'
+              : 'কৃষি ও প্রাণিসম্পদ প্রকল্পে বাজার, রোগ, আবহাওয়া ও পরিচালনাগত ঝুঁকি থাকে। অরিজিন অ্যাগ্রো কোনো নির্দিষ্ট মুনাফা বা মূলধন সংরক্ষণের গ্যারান্টি দেয় না। আপনি স্বাক্ষরিত মুশারাকা চুক্তির অধীনে প্রকল্পের প্রকৃত অর্থনৈতিক ফলাফলে অংশ নেন। চূড়ান্ত শর্ত শরিয়াহ, আইন ও হিসাব পর্যালোচনা সাপেক্ষ।'}
+          </p>
+        </div>
+
+        {/* Plans from database */}
         {plansLoading && (
-          <div className="text-center py-14 text-gray-500 mb-20">
+          <div className="text-center py-14 text-gray-500 mb-16">
             {lang === 'EN' ? 'Loading investment plans...' : 'বিনিয়োগ প্ল্যান লোড হচ্ছে...'}
           </div>
         )}
 
         {!plansLoading && plans.length === 0 && (
-          <div className="text-center py-14 text-gray-500 mb-20">
-            {lang === 'EN' ? 'Investment plans coming soon.' : 'বিনিয়োগ প্ল্যান শীঘ্রই আসছে।'}
+          <div className="rounded-2xl border-2 border-[#0A5C36]/20 bg-white p-7 mb-16 max-w-2xl mx-auto">
+            <p className="text-xs font-bold uppercase tracking-widest mb-1 text-[#F26522]">
+              {lang === 'EN' ? 'Seed / Pilot Musharaka' : 'সিড / পাইলট মুশারাকা'}
+            </p>
+            <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
+              {lang === 'EN' ? 'Project Musharaka Round' : 'প্রজেক্ট মুশারাকা রাউন্ড'}
+            </h3>
+            <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+              {lang === 'EN'
+                ? 'External capital target ৳3,50,000 · Minimum participation ৳20,000 · Minimum tenure 2 years · Profit share every 6 months if distributable profit exists.'
+                : 'বাহ্যিক মূলধন লক্ষ্য ৳৩,৫০,০০০ · ন্যূনতম অংশগ্রহণ ৳২০,০০০ · ন্যূনতম মেয়াদ ২ বছর · বণ্টনযোগ্য মুনাফা থাকলে প্রতি ৬ মাসে মুনাফা ভাগ।'}
+            </p>
+            <a
+              href="#invest-method"
+              onClick={() => setChosenPlanKey('pilot')}
+              className="inline-flex items-center gap-2 py-3.5 px-6 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors"
+            >
+              {lang === 'EN' ? 'Start Application' : 'আবেদন শুরু করুন'}
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
         )}
 
         {!plansLoading && plans.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
             {plans.map((plan) => (
-              <div key={plan.id} className="relative rounded-2xl border-2 border-[#0A5C36]/20 bg-white overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-xl">
+              <div
+                key={plan.id}
+                className="relative rounded-2xl border-2 border-[#0A5C36]/20 bg-white overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-xl"
+              >
                 <div className="p-7 flex flex-col flex-1">
                   <p className="text-xs font-bold uppercase tracking-widest mb-1 text-[#F26522]">
-                    {lang === 'EN' ? 'Musharakah Plan' : 'মুশারাকা প্ল্যান'}
+                    {lang === 'EN' ? 'Musharaka Plan' : 'মুশারাকা প্ল্যান'}
                   </p>
                   <h3 className="text-2xl font-extrabold mb-2 text-gray-900">
-                    {lang === 'EN' ? plan.name : (plan.nameBn || plan.name)}
+                    {lang === 'EN' ? plan.name : plan.nameBn || plan.name}
                   </h3>
 
                   {(plan.description || plan.descriptionBn) && (
                     <p className="text-sm text-gray-600 leading-relaxed mb-5">
-                      {lang === 'EN' ? plan.description : (plan.descriptionBn || plan.description)}
+                      {lang === 'EN' ? plan.description : plan.descriptionBn || plan.description}
                     </p>
                   )}
 
                   <div className="rounded-xl p-4 mb-6 bg-[#F7F4EE]">
                     {plan.minAmount && (
                       <>
-                        <p className="text-3xl font-extrabold text-[#0A5C36]">৳ {plan.minAmount.toLocaleString('en-IN')}+</p>
+                        <p className="text-3xl font-extrabold text-[#0A5C36]">
+                          ৳ {plan.minAmount.toLocaleString('en-IN')}+
+                        </p>
                         <p className="text-xs mt-1 text-gray-500">
                           {lang === 'EN' ? 'Minimum Investment' : 'ন্যূনতম বিনিয়োগ'}
                         </p>
@@ -221,14 +378,23 @@ export default function InvestorSection() {
                     <div className="flex items-center gap-4 mt-3">
                       <div>
                         <p className="text-lg font-extrabold text-[#F26522]">
-                          {lang === 'EN' ? plan.tenure : (plan.tenureBn || plan.tenure)}
+                          {lang === 'EN'
+                            ? plan.tenure || '2 Years'
+                            : plan.tenureBn || plan.tenure || '২ বছর'}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {lang === 'EN' ? 'Min. tenure' : 'ন্যূনতম মেয়াদ'}
                         </p>
                       </div>
                       <div className="w-px h-10 bg-gray-300" />
                       <div>
-                        <p className="text-lg font-extrabold text-gray-800">{plan.companySharePct}:{plan.investorSharePct}</p>
+                        <p className="text-lg font-extrabold text-gray-800">
+                          {plan.companySharePct}:{plan.investorSharePct}
+                        </p>
                         <p className="text-xs text-gray-500">
-                          {lang === 'EN' ? 'Company : Investor Profit Split' : 'কোম্পানি : বিনিয়োগকারী মুনাফা ভাগ'}
+                          {lang === 'EN'
+                            ? 'Company : Investor (proposed)'
+                            : 'কোম্পানি : বিনিয়োগকারী (প্রস্তাবিত)'}
                         </p>
                       </div>
                     </div>
@@ -238,8 +404,8 @@ export default function InvestorSection() {
                     <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
                     <p className="text-xs text-amber-800 leading-relaxed">
                       {lang === 'EN'
-                        ? 'This is a profit-and-loss sharing Musharakah partnership, not a fixed deposit. Both Origin Agro and the investor contribute capital, and in the event of a genuine business loss, capital is reduced proportionally between both parties based on their share of investment.'
-                        : 'এটি একটি মুনাফা-লোকসান ভাগাভাগি মুশারাকা অংশীদারিত্ব, নির্দিষ্ট আমানত নয়। অরিজিন অ্যাগ্রো এবং বিনিয়োগকারী উভয়েই মূলধন অবদান রাখে, এবং প্রকৃত ব্যবসায়িক লোকসানের ক্ষেত্রে উভয় পক্ষের বিনিয়োগের অংশ অনুসারে মূলধন সমানুপাতিকভাবে হ্রাস পায়।'}
+                        ? 'Profit-and-loss sharing Musharaka. Not a fixed deposit. Genuine loss reduces capital by contribution ratio. Profit cycles every 6 months if distributable profit exists.'
+                        : 'মুনাফা-লোকসান ভাগাভাগি মুশারাকা। নির্দিষ্ট আমানত নয়। প্রকৃত ক্ষতিতে মূলধন অবদান অনুপাতে হ্রাস পায়। বণ্টনযোগ্য মুনাফা থাকলে প্রতি ৬ মাসে চক্র।'}
                     </p>
                   </div>
 
@@ -257,71 +423,79 @@ export default function InvestorSection() {
           </div>
         )}
 
-        {/* Choose Investment Method */}
-        {!plansLoading && plans.length > 0 && (
-          <div id="invest-method" className="mb-20 scroll-mt-24">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl lg:text-3xl font-extrabold text-gray-900">
-                {lang === 'EN' ? 'Choose Your Investment Method' : 'আপনার বিনিয়োগ পদ্ধতি বেছে নিন'}
-              </h3>
-              <p className="text-gray-500 text-sm mt-3">
-                {lang === 'EN' ? 'Selected Plan:' : 'নির্বাচিত প্ল্যান:'}{' '}
-                <span className="font-bold text-gray-800">
-                  {lang === 'EN'
-                    ? (plans.find((p) => p.planKey === chosenPlanKey)?.name || plans[0]?.name)
-                    : (plans.find((p) => p.planKey === chosenPlanKey)?.nameBn || plans.find((p) => p.planKey === chosenPlanKey)?.name || plans[0]?.name)}
-                </span>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <button
-                onClick={() => setInvestMethod('online')}
-                className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${investMethod === 'online' ? 'border-[#0A5C36] bg-[#F7F4EE] shadow-md' : 'border-gray-200 bg-white hover:border-[#0A5C36]/40'}`}
-              >
-                <div className="w-12 h-12 bg-[#0A5C36] rounded-xl flex items-center justify-center mb-4">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="font-extrabold text-gray-900 text-lg mb-1">
-                  {lang === 'EN' ? 'Online' : 'অনলাইন'}
-                </h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {lang === 'EN'
-                    ? 'Fill out a secure digital application form now. Best for smaller amounts and quick processing.'
-                    : 'এখনই একটি নিরাপদ ডিজিটাল আবেদন ফর্ম পূরণ করুন। ছোট অঙ্কের এবং দ্রুত প্রক্রিয়াকরণের জন্য সেরা।'}
-                </p>
-              </button>
-
-              <button
-                onClick={() => setInvestMethod('physical')}
-                className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${investMethod === 'physical' ? 'border-[#0A5C36] bg-[#F7F4EE] shadow-md' : 'border-gray-200 bg-white hover:border-[#0A5C36]/40'}`}
-              >
-                <div className="w-12 h-12 bg-[#F26522] rounded-xl flex items-center justify-center mb-4">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="font-extrabold text-gray-900 text-lg mb-1">
-                  {lang === 'EN' ? 'Physical / Office Visit' : 'সরাসরি অফিসে আসুন'}
-                </h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {lang === 'EN'
-                    ? 'Book an appointment to visit our office, meet our team, and sign your agreement in person.'
-                    : 'আমাদের অফিসে এসে আমাদের টিমের সাথে দেখা করুন এবং ব্যক্তিগতভাবে চুক্তি স্বাক্ষর করুন।'}
-                </p>
-              </button>
-            </div>
-
-            {investMethod === 'online' && (
-              <KycForm planKey={chosenPlanKey || plans[0]?.planKey || ''} />
-            )}
-
-            {investMethod === 'physical' && (
-              <AppointmentForm planInterest={chosenPlanKey || plans[0]?.planKey || ''} />
-            )}
+        {/* Method */}
+        <div id="invest-method" className="mb-16 scroll-mt-24">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl lg:text-3xl font-extrabold text-gray-900">
+              {lang === 'EN' ? 'Choose Your Investment Method' : 'বিনিয়োগ পদ্ধতি বেছে নিন'}
+            </h3>
+            <p className="text-gray-500 text-sm mt-3">
+              {lang === 'EN' ? 'Selected:' : 'নির্বাচিত:'}{' '}
+              <span className="font-bold text-gray-800">
+                {lang === 'EN'
+                  ? plans.find((p) => p.planKey === chosenPlanKey)?.name ||
+                    'Project Musharaka'
+                  : plans.find((p) => p.planKey === chosenPlanKey)?.nameBn ||
+                    plans.find((p) => p.planKey === chosenPlanKey)?.name ||
+                    'প্রজেক্ট মুশারাকা'}
+              </span>
+            </p>
           </div>
-        )}
 
-        {/* Illustrative Profit Calculator */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <button
+              onClick={() => setInvestMethod('online')}
+              className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${
+                investMethod === 'online'
+                  ? 'border-[#0A5C36] bg-[#F7F4EE] shadow-md'
+                  : 'border-gray-200 bg-white hover:border-[#0A5C36]/40'
+              }`}
+            >
+              <div className="w-12 h-12 bg-[#0A5C36] rounded-xl flex items-center justify-center mb-4">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-extrabold text-gray-900 text-lg mb-1">
+                {lang === 'EN' ? 'Online Application' : 'অনলাইন আবেদন'}
+              </h4>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {lang === 'EN'
+                  ? 'Fill the secure investor form (NID & details). Team will contact you for agreement & next steps.'
+                  : 'নিরাপদ বিনিয়োগকারী ফর্ম পূরণ করুন (এনআইডি ও তথ্য)। চুক্তি ও পরবর্তী ধাপের জন্য টিম যোগাযোগ করবে।'}
+              </p>
+            </button>
+
+            <button
+              onClick={() => setInvestMethod('physical')}
+              className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${
+                investMethod === 'physical'
+                  ? 'border-[#0A5C36] bg-[#F7F4EE] shadow-md'
+                  : 'border-gray-200 bg-white hover:border-[#0A5C36]/40'
+              }`}
+            >
+              <div className="w-12 h-12 bg-[#F26522] rounded-xl flex items-center justify-center mb-4">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-extrabold text-gray-900 text-lg mb-1">
+                {lang === 'EN' ? 'Office Visit' : 'অফিসে আসুন'}
+              </h4>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {lang === 'EN'
+                  ? 'Book an appointment, meet the team, and sign the Musharaka agreement in person.'
+                  : 'অ্যাপয়েন্টমেন্ট বুক করুন, টিমের সাথে দেখা করুন এবং সরাসরি মুশারাকা চুক্তি স্বাক্ষর করুন।'}
+              </p>
+            </button>
+          </div>
+
+          {investMethod === 'online' && (
+            <KycForm planKey={chosenPlanKey || plans[0]?.planKey || 'pilot'} />
+          )}
+          {investMethod === 'physical' && (
+            <AppointmentForm planInterest={chosenPlanKey || plans[0]?.planKey || 'pilot'} />
+          )}
+        </div>
+
+        {/* Calculator — illustrative only */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch mb-16">
           <div className="bg-[#F7F4EE] rounded-2xl p-6 sm:p-8 border border-gray-100">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-[#0A5C36] rounded-xl flex items-center justify-center">
@@ -329,42 +503,44 @@ export default function InvestorSection() {
               </div>
               <div>
                 <h3 className="font-extrabold text-gray-900 text-lg">
-                  {lang === 'EN' ? 'Illustrative Profit Calculator' : 'উদাহরণমূলক মুনাফা ক্যালকুলেটর'}
+                  {lang === 'EN' ? 'Illustrative Calculator' : 'উদাহরণমূলক ক্যালকুলেটর'}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {lang === 'EN' ? 'Based on Musharakah profit-sharing' : 'মুশারাকা মুনাফা ভাগাভাগির ভিত্তিতে'}
+                  {lang === 'EN'
+                    ? 'Not a promise — for understanding only'
+                    : 'প্রতিশ্রুতি নয় — শুধু বোঝার জন্য'}
                 </p>
               </div>
             </div>
 
             <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  {lang === 'EN' ? 'Select Plan' : 'প্ল্যান বেছে নিন'}
-                </label>
-                <div className="flex flex-col gap-2">
-                  {plans.map((plan) => (
-                    <button
-                      key={plan.planKey}
-                      onClick={() => handleSelectPlan(plan.planKey)}
-                      className={
-                        'py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ' +
-                        (selectedPlanKey === plan.planKey
-                          ? 'bg-[#0A5C36] text-white shadow-md'
-                          : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]')
-                      }
-                    >
-                      {(lang === 'EN' ? plan.name : (plan.nameBn || plan.name)) +
-                        ' — ' +
-                        (lang === 'EN' ? plan.tenure : (plan.tenureBn || plan.tenure)) +
-                        ' | ' +
-                        plan.companySharePct +
-                        ':' +
-                        plan.investorSharePct}
-                    </button>
-                  ))}
+              {plans.length > 0 && (
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    {lang === 'EN' ? 'Select Plan' : 'প্ল্যান বেছে নিন'}
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    {plans.map((plan) => (
+                      <button
+                        key={plan.planKey}
+                        onClick={() => handleSelectPlan(plan.planKey)}
+                        className={
+                          'py-2.5 px-3 rounded-xl font-bold text-sm text-left transition-all duration-200 ' +
+                          (selectedPlanKey === plan.planKey
+                            ? 'bg-[#0A5C36] text-white shadow-md'
+                            : 'bg-white border border-gray-200 text-gray-700 hover:border-[#0A5C36]')
+                        }
+                      >
+                        {(lang === 'EN' ? plan.name : plan.nameBn || plan.name) +
+                          ' | ' +
+                          plan.companySharePct +
+                          ':' +
+                          plan.investorSharePct}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -374,7 +550,7 @@ export default function InvestorSection() {
                   type="range"
                   min={minAmount}
                   max={1000000}
-                  step={10000}
+                  step={5000}
                   value={amount < minAmount ? minAmount : amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0A5C36]"
@@ -388,28 +564,26 @@ export default function InvestorSection() {
                 </div>
               </div>
 
-              {selectedPlan && (
-                <div className="bg-white rounded-xl p-3 border border-gray-200 text-xs text-gray-600 space-y-1">
-                  <p>
-                    <span className="font-bold text-gray-800">
-                      {lang === 'EN' ? 'Plan:' : 'প্ল্যান:'}
-                    </span>{' '}
-                    {lang === 'EN' ? selectedPlan.name : (selectedPlan.nameBn || selectedPlan.name)}
-                  </p>
-                  <p>
-                    <span className="font-bold text-gray-800">
-                      {lang === 'EN' ? 'Illustrative profit rate:' : 'উদাহরণমূলক মুনাফার হার:'}
-                    </span>{' '}
-                    {illustrativeRate}%
-                  </p>
-                  <p>
-                    <span className="font-bold text-gray-800">
-                      {lang === 'EN' ? 'Profit split (Company:Investor):' : 'মুনাফা ভাগ (কোম্পানি:বিনিয়োগকারী):'}
-                    </span>{' '}
-                    {companySharePct}:{investorSharePct}
-                  </p>
-                </div>
-              )}
+              <div className="bg-white rounded-xl p-3 border border-gray-200 text-xs text-gray-600 space-y-1">
+                <p>
+                  <span className="font-bold text-gray-800">
+                    {lang === 'EN' ? 'Illustrative rate:' : 'উদাহরণ হার:'}
+                  </span>{' '}
+                  {illustrativeRate}%
+                </p>
+                <p>
+                  <span className="font-bold text-gray-800">
+                    {lang === 'EN' ? 'Split (Company:Investor):' : 'ভাগ (কোম্পানি:বিনিয়োগকারী):'}
+                  </span>{' '}
+                  {companySharePct}:{investorSharePct}
+                </p>
+                <p>
+                  <span className="font-bold text-gray-800">
+                    {lang === 'EN' ? 'Cycles:' : 'পর্ব:'}
+                  </span>{' '}
+                  {lang === 'EN' ? 'Every 6 months · max 4 in 2 years' : 'প্রতি ৬ মাস · ২ বছরে সর্বোচ্চ ৪'}
+                </p>
+              </div>
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
@@ -417,71 +591,79 @@ export default function InvestorSection() {
                 <p className="text-lg font-extrabold text-[#0A5C36]">
                   ৳ {estimatedBusinessProfit.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs mt-1 text-gray-500 leading-snug">
+                <p className="text-xs mt-1 text-gray-500">
                   {lang === 'EN' ? 'Est. Business Profit' : 'আনুমানিক ব্যবসায়িক মুনাফা'}
                 </p>
               </div>
-
               <div className="rounded-xl p-3 text-center bg-[#0A5C36] text-white">
-                <p className="text-lg font-extrabold text-white">
+                <p className="text-lg font-extrabold">
                   ৳ {estimatedInvestorShare.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs mt-1 text-white/70 leading-snug">
+                <p className="text-xs mt-1 text-white/70">
                   {lang === 'EN' ? 'Your Profit Share' : 'আপনার মুনাফার অংশ'}
                 </p>
               </div>
-
               <div className="rounded-xl p-3 text-center bg-white border border-gray-200">
                 <p className="text-lg font-extrabold text-gray-700">
                   ৳ {estimatedCompanyShare.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs mt-1 text-gray-500 leading-snug">
-                  {lang === 'EN' ? 'Company Profit Share' : 'কোম্পানির মুনাফার অংশ'}
+                <p className="text-xs mt-1 text-gray-500">
+                  {lang === 'EN' ? 'Company Share' : 'কোম্পানির অংশ'}
                 </p>
               </div>
-
               <div className="rounded-xl p-3 text-center bg-white border border-gray-200">
                 <p className="text-lg font-extrabold text-[#F26522]">
                   ৳ {estimatedTotalPayout.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs mt-1 text-gray-500 leading-snug">
-                  {lang === 'EN' ? 'Est. Total Payout' : 'আনুমানিক মোট প্রাপ্তি'}
+                <p className="text-xs mt-1 text-gray-500">
+                  {lang === 'EN' ? 'Capital + Est. Profit' : 'মূলধন + আনুমানিক মুনাফা'}
                 </p>
               </div>
             </div>
 
             <p className="text-xs text-gray-400 mt-4 leading-relaxed">
               {lang === 'EN'
-                ? '* Illustrative estimate only — not a guaranteed or fixed return. Under Musharakah, actual profit depends on real business results. In case of genuine loss, capital is reduced proportionally according to investment share.'
-                : '* শুধুমাত্র উদাহরণমূলক অনুমান — নিশ্চিত বা নির্দিষ্ট রিটার্ন নয়। মুশারাকা অনুযায়ী প্রকৃত মুনাফা ব্যবসায়িক ফলাফলের উপর নির্ভর করে। প্রকৃত লোকসানে মূলধন বিনিয়োগের অংশ অনুসারে সমানুপাতিকভাবে হ্রাস পায়।'}
+                ? '* Illustrative only. Not guaranteed. Under Musharaka, actual profit depends on real results. If a period has no profit, no profit is paid for that period. Genuine loss is shared by capital ratio.'
+                : '* শুধু উদাহরণ। গ্যারান্টি নয়। মুশারাকায় প্রকৃত মুনাফা ফলাফলের উপর নির্ভর করে। কোনো পর্বে মুনাফা না থাকলে সে পর্বে মুনাফা দেওয়া হয় না। প্রকৃত ক্ষতি মূলধন অনুপাতে বহন হয়।'}
             </p>
           </div>
 
           <div className="relative rounded-2xl overflow-hidden min-h-[420px]">
             <Image
               src="/images/investor-bg.png"
-              alt="Origin Agro aerial farm view for investors"
+              alt="Origin Agro farm for investors"
               fill
               className="object-cover"
             />
             <div className="absolute inset-0 bg-[#063D24]/75" />
             <div className="relative z-10 p-8 flex flex-col justify-end h-full">
               <div className="flex items-center gap-2 mb-3">
-                <BarChart3 className="w-5 h-5 text-[#F26522]" />
+                <BadgeCheck className="w-5 h-5 text-[#F26522]" />
                 <p className="text-[#F26522] font-bold text-xs uppercase tracking-widest">
-                  {lang === 'EN' ? 'Why Invest' : 'কেন বিনিয়োগ করবেন'}
+                  {lang === 'EN' ? 'Why This Structure' : 'কেন এই কাঠামো'}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  { en: 'Land-backed security', bn: 'জমি দ্বারা সুরক্ষিত' },
-                  { en: 'Islamic profit model', bn: 'ইসলামিক মুনাফা মডেল' },
-                  { en: 'Transparent reporting', bn: 'স্বচ্ছ প্রতিবেদন' },
-                  { en: 'Multiple income streams', bn: 'একাধিক আয়ের উৎস' },
-                ].map((item) => (
-                  <div key={item.en} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 flex items-start gap-2">
+                {(lang === 'EN'
+                  ? [
+                      'Shariah-aligned Musharaka',
+                      'Shared risk & reward',
+                      '6-month transparent reports',
+                      'Farm-to-food real business',
+                    ]
+                  : [
+                      'শরিয়াহসম্মত মুশারাকা',
+                      'ঝুঁকি ও পুরস্কার ভাগাভাগি',
+                      '৬ মাসের স্বচ্ছ প্রতিবেদন',
+                      'ফার্ম-টু-ফুড প্রকৃত ব্যবসা',
+                    ]
+                ).map((item) => (
+                  <div
+                    key={item}
+                    className="bg-white/10 backdrop-blur-sm rounded-xl p-3 flex items-start gap-2"
+                  >
                     <CheckCircle2 className="w-4 h-4 text-[#F26522] shrink-0 mt-0.5" />
-                    <p className="text-white text-sm font-semibold">{lang === 'EN' ? item.en : item.bn}</p>
+                    <p className="text-white text-sm font-semibold">{item}</p>
                   </div>
                 ))}
               </div>
@@ -489,20 +671,19 @@ export default function InvestorSection() {
           </div>
         </div>
 
-        {/* How to Invest - Real Steps (Card Flow) */}
+        {/* 5 Steps */}
         <div>
           <div className="text-center mb-10">
             <h3 className="text-2xl lg:text-3xl font-extrabold text-gray-900">
-              {lang === 'EN' ? 'How to Invest in 5 Steps' : '৫টি সহজ ধাপে বিনিয়োগ শুরু করুন'}
+              {lang === 'EN' ? 'How Musharaka Investment Works' : 'মুশারাকা বিনিয়োগ কীভাবে কাজ করে'}
             </h3>
             <p className="text-gray-500 text-sm mt-2 max-w-xl mx-auto">
               {lang === 'EN'
-                ? 'Your real Musharakah journey on Origin Agro — from choosing a plan to receiving profit share.'
-                : 'অরিজিন অ্যাগ্রোতে আপনার প্রকৃত মুশারাকা যাত্রা — প্ল্যান বেছে নেওয়া থেকে মুনাফার অংশ পাওয়া পর্যন্ত।'}
+                ? 'From application to profit cycles and settlement — aligned with Origin Agro’s Musharaka agreement.'
+                : 'আবেদন থেকে মুনাফা চক্র ও নিষ্পত্তি — অরিজিন অ্যাগ্রোর মুশারাকা চুক্তির সাথে সামঞ্জস্যপূর্ণ।'}
             </p>
           </div>
 
-          {/* Mobile vertical flow */}
           <div className="flex flex-col gap-4 lg:hidden">
             {steps.map((step, i) => (
               <div key={step.num} className="relative">
@@ -533,7 +714,6 @@ export default function InvestorSection() {
             ))}
           </div>
 
-          {/* Desktop horizontal flow cards */}
           <div className="hidden lg:grid grid-cols-5 gap-4">
             {steps.map((step, i) => (
               <div key={step.num} className="relative">
@@ -566,18 +746,18 @@ export default function InvestorSection() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
             <a
-              href="#footer"
+              href="#invest-method"
               className="bg-[#F26522] hover:bg-[#d4551a] text-white font-bold px-10 py-4 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-base"
             >
               <FileText className="w-5 h-5" />
-              {lang === 'EN' ? 'Download Prospectus' : 'প্রসপেক্টাস ডাউনলোড করুন'}
+              {lang === 'EN' ? 'Apply to Invest' : 'বিনিয়োগে আবেদন করুন'}
             </a>
             <a
               href="#footer"
               className="border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white font-bold px-10 py-4 rounded-xl flex items-center gap-2 transition-all duration-200 text-base"
             >
               <Calendar className="w-5 h-5" />
-              {lang === 'EN' ? 'Book a Consultation' : 'পরামর্শ বুক করুন'}
+              {lang === 'EN' ? 'Contact Team' : 'টিমের সাথে যোগাযোগ'}
             </a>
           </div>
         </div>
