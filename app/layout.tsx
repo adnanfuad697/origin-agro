@@ -15,8 +15,17 @@ const notoSerifBengali = Noto_Serif_Bengali({
 export const metadata: Metadata = {
   title: 'Origin Agro — অরিজিন অ্যাগ্রো | Integrated Agro Farm & Musharakah Investment',
   description:
-    'Origin Agro | অরিজিন অ্যাগ্রো — Bangladesh\'s Shariah-guided integrated agro-investment platform. Musharakah partnership investment, organic agriculture & livestock farming. বাংলাদেশের শরিয়াহ-নির্দেশিত কৃষি বিনিয়োগ প্ল্যাটফর্ম।',
+    "Origin Agro | অরিজিন অ্যাগ্রো — Bangladesh's Shariah-guided integrated agro-investment platform. Musharakah partnership investment, organic agriculture & livestock farming. বাংলাদেশের শরিয়াহ-নির্দেশিত কৃষি বিনিয়োগ প্ল্যাটফর্ম।",
   generator: 'v0.app',
+  icons: {
+    icon: [
+      { url: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/images/logo.png', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-icon.png' }],
+    shortcut: ['/icon-light-32x32.png'],
+  },
 }
 
 export const viewport: Viewport = {
