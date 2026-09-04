@@ -15,6 +15,17 @@ interface Profile {
   mobile_number: string | null
 }
 
+function isRecoveryUrl() {
+  if (typeof window === 'undefined') return false
+  const hash = window.location.hash || ''
+  const search = window.location.search || ''
+  return (
+    hash.includes('type=recovery') ||
+    search.includes('type=recovery') ||
+    hash.includes('type=invite')
+  )
+}
+
 export default function AccountPage() {
   const [loadingSession, setLoadingSession] = useState(true)
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -33,8 +44,6 @@ export default function AccountPage() {
         .eq('id', session.user.id)
         .single()
 
-      // If no profile row exists yet, create it now (this is guaranteed to work
-      // since we have a valid authenticated session at this point).
       if (!profileData) {
         const metaName = (session.user.user_metadata?.full_name as string) || null
         const metaMobile = (session.user.user_metadata?.mobile_number as string) || null
@@ -57,9 +66,19 @@ export default function AccountPage() {
   }
 
   useEffect(() => {
+    // If recovery link landed on /account, send user to set-password page
+    if (isRecoveryUrl()) {
+      window.location.replace('/account/reset-password' + window.location.hash + window.location.search)
+      return
+    }
+
     loadSession()
 
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        window.location.replace('/account/reset-password')
+        return
+      }
       loadSession()
     })
 
@@ -96,7 +115,6 @@ export default function AccountPage() {
 
           {!loadingSession && userEmail && (
             <div className="max-w-3xl mx-auto">
-              {/* Profile Card */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 mb-6 flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-[#0A5C36] rounded-full flex items-center justify-center">
@@ -114,7 +132,6 @@ export default function AccountPage() {
                 </button>
               </div>
 
-              {/* Order History */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 bg-[#0A5C36]/10 rounded-xl flex items-center justify-center">
