@@ -8,11 +8,12 @@ import MessagesPanel from '@/components/messages-panel'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
-import { User, LogOut, Package, MessageSquare } from 'lucide-react'
+import { User, LogOut, Package, MessageSquare, Shield } from 'lucide-react'
 
 interface Profile {
   full_name: string | null
   mobile_number: string | null
+  role?: string | null
 }
 
 function isRecoveryUrl() {
@@ -40,7 +41,7 @@ export default function AccountPage() {
 
       let { data: profileData } = await supabase
         .from('customer_profiles')
-        .select('full_name, mobile_number')
+        .select('full_name, mobile_number, role')
         .eq('id', session.user.id)
         .single()
 
@@ -52,9 +53,10 @@ export default function AccountPage() {
           id: session.user.id,
           full_name: metaName,
           mobile_number: metaMobile,
+          role: 'customer',
         }])
 
-        profileData = { full_name: metaName, mobile_number: metaMobile }
+        profileData = { full_name: metaName, mobile_number: metaMobile, role: 'customer' }
       }
 
       setProfile(profileData)
@@ -66,7 +68,6 @@ export default function AccountPage() {
   }
 
   useEffect(() => {
-    // If recovery link landed on /account, send user to set-password page
     if (isRecoveryUrl()) {
       window.location.replace('/account/reset-password' + window.location.hash + window.location.search)
       return
@@ -123,13 +124,33 @@ export default function AccountPage() {
                   <div>
                     <h2 className="font-extrabold text-gray-900 text-lg">{profile?.full_name || 'Welcome'}</h2>
                     <p className="text-gray-500 text-sm">{userEmail}</p>
-                    {profile?.mobile_number && <p className="text-gray-400 text-xs">{profile.mobile_number}</p>}
+                    {profile?.mobile_number && (
+                      <p className="text-gray-400 text-xs">{profile.mobile_number}</p>
+                    )}
+                    {profile?.role === 'admin' && (
+                      <p className="text-[11px] font-bold text-[#0A5C36] mt-0.5">Admin</p>
+                    )}
                   </div>
                 </div>
-                <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-600 transition-colors font-bold text-sm">
-                  <LogOut className="w-4 h-4" />
-                  Log Out
-                </button>
+
+                <div className="flex flex-wrap gap-2">
+                  {profile?.role === 'admin' && (
+                    <a
+                      href="/admin/messages"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold text-sm transition-colors"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Admin Panel
+                    </a>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-600 transition-colors font-bold text-sm"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Log Out
+                  </button>
+                </div>
               </div>
 
               <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
