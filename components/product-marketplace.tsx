@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/contexts/language-context'
-import { Star, Truck } from 'lucide-react'
+import { Star, Truck, Search } from 'lucide-react'
 
 interface Product {
   id: number
@@ -76,6 +76,7 @@ export default function ProductMarketplace() {
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [showAllProducts, setShowAllProducts] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -121,7 +122,29 @@ export default function ProductMarketplace() {
   }, [lang])
 
   const uniqueCategories = ['all', ...Array.from(new Set(products.map((p) => p.category)))]
-  const filtered = activeCategory === 'all' ? products : products.filter((p) => p.category === activeCategory)
+
+  const filtered = products.filter((p) => {
+    // Category filter
+    const matchesCategory = activeCategory === 'all' || p.category === activeCategory
+
+    // Search filter
+    if (!searchQuery.trim()) return matchesCategory
+
+    const q = searchQuery.toLowerCase().trim()
+    const name = (lang === 'EN' ? p.name : (p.nameBn || p.name)).toLowerCase()
+    const desc = (lang === 'EN' ? p.description : (p.descriptionBn || p.description) || '').toLowerCase()
+    const tags = (p.tags || []).join(' ').toLowerCase()
+    const category = p.category.toLowerCase()
+
+    const matchesSearch =
+      name.includes(q) ||
+      desc.includes(q) ||
+      tags.includes(q) ||
+      category.includes(q)
+
+    return matchesCategory && matchesSearch
+  })
+
   const visibleProducts = showAllProducts ? filtered : filtered.slice(0, 3)
 
   return (
@@ -134,6 +157,21 @@ export default function ProductMarketplace() {
           <h2 className="text-3xl font-extrabold text-gray-900 mb-3">
             {lang === 'EN' ? 'Shop Directly From the Farm' : 'সরাসরি খামার থেকে কিনুন'}
           </h2>
+        </div>
+
+        {/* Search Box */}
+        <div className="max-w-md mx-auto mb-6 sm:mb-8 relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setShowAllProducts(false)
+            }}
+            placeholder={lang === 'EN' ? 'Search products...' : 'পণ্য খুঁজুন...'}
+            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0A5C36] focus:border-transparent shadow-sm"
+          />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-10">
@@ -170,7 +208,9 @@ export default function ProductMarketplace() {
 
         {!loading && !errorMsg && filtered.length === 0 && (
           <div className="text-center py-20 text-gray-500">
-            {lang === 'EN' ? 'No products in this category yet.' : 'এই ক্যাটাগরিতে এখনো কোনো পণ্য নেই।'}
+            {searchQuery.trim()
+              ? (lang === 'EN' ? 'No products match your search.' : 'আপনার অনুসন্ধানের সাথে মিলে এমন কোনো পণ্য নেই।')
+              : (lang === 'EN' ? 'No products in this category yet.' : 'এই ক্যাটাগরিতে এখনো কোনো পণ্য নেই।')}
           </div>
         )}
 
@@ -253,16 +293,16 @@ export default function ProductMarketplace() {
 
             {filtered.length > 3 && (
               <div className="text-center mt-8">
-               <button
-  onClick={() => setShowAllProducts(!showAllProducts)}
-  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
->
-  {showAllProducts
-    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
-    : (lang === 'EN'
-        ? 'See More (' + (filtered.length - 3) + ' more)'
-        : 'আরও দেখুন (' + (filtered.length - 3) + 'টি আরও)')}
-</button>
+                <button
+                  onClick={() => setShowAllProducts(!showAllProducts)}
+                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[#0A5C36] text-[#0A5C36] hover:bg-[#0A5C36] hover:text-white transition-colors"
+                >
+                  {showAllProducts
+                    ? (lang === 'EN' ? 'Show Less' : 'কম দেখুন')
+                    : (lang === 'EN'
+                        ? 'See More (' + (filtered.length - 3) + ' more)'
+                        : 'আরও দেখুন (' + (filtered.length - 3) + 'টি আরও)')}
+                </button>
               </div>
             )}
           </>
