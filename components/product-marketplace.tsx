@@ -69,55 +69,6 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-// ---------- Fuzzy / Typo tolerance helpers ----------
-function levenshtein(a: string, b: string): number {
-  const matrix: number[][] = []
-
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i]
-  }
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j
-  }
-
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1]
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1,     // insertion
-          matrix[i - 1][j] + 1      // deletion
-        )
-      }
-    }
-  }
-
-  return matrix[b.length][a.length]
-}
-
-function isSimilar(text: string, query: string): boolean {
-  if (!text || !query) return false
-
-  // Exact or partial match
-  if (text.includes(query)) return true
-
-  // For short queries allow more flexibility
-  const maxDistance = query.length <= 4 ? 1 : query.length <= 7 ? 2 : 3
-
-  // Check whole text
-  if (levenshtein(text, query) <= maxDistance) return true
-
-  // Check individual words
-  const words = text.split(/\s+/)
-  return words.some((word) => {
-    if (word.includes(query) || query.includes(word)) return true
-    return levenshtein(word, query) <= maxDistance
-  })
-}
-// ---------------------------------------------------
-
 export default function ProductMarketplace() {
   const { lang } = useLanguage()
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -176,26 +127,24 @@ export default function ProductMarketplace() {
     // Category filter
     const matchesCategory = activeCategory === 'all' || p.category === activeCategory
 
-    // Search filter
+    // Search filter - always search BOTH English + Bangla
     if (!searchQuery.trim()) return matchesCategory
 
     const q = searchQuery.toLowerCase().trim()
 
-    // Always search BOTH English and Bangla
-    const nameEn = (p.name || '').toLowerCase()
-    const nameBn = (p.nameBn || '').toLowerCase()
-    const descEn = (p.description || '').toLowerCase()
-    const descBn = (p.descriptionBn || '').toLowerCase()
-    const tags = (p.tags || []).join(' ').toLowerCase()
-    const category = (p.category || '').toLowerCase()
+    const searchableText = [
+      p.name,
+      p.nameBn,
+      p.description,
+      p.descriptionBn,
+      p.category,
+      ...(p.tags || [])
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
 
-    const matchesSearch =
-      isSimilar(nameEn, q) ||
-      isSimilar(nameBn, q) ||
-      isSimilar(descEn, q) ||
-      isSimilar(descBn, q) ||
-      isSimilar(tags, q) ||
-      isSimilar(category, q)
+    const matchesSearch = searchableText.includes(q)
 
     return matchesCategory && matchesSearch
   })
@@ -216,7 +165,7 @@ export default function ProductMarketplace() {
 
         {/* Search Box */}
         <div className="max-w-md mx-auto mb-6 sm:mb-8 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
