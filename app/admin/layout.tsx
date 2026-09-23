@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { getAdminSession } from '@/lib/admin'
 import { supabase } from '@/lib/supabase'
-import { MessageSquare, Package, LogOut, LayoutDashboard } from 'lucide-react'
+import { MessageSquare, Package, LogOut, LayoutDashboard, ShoppingBag } from 'lucide-react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -40,12 +40,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const nav = [
-const nav = [
-  { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
-  { href: '/admin/orders', label: 'Orders', icon: Package },
-]
- 
+    { href: '/admin/products', label: 'Products', icon: ShoppingBag },
+    { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/admin/orders', label: 'Orders', icon: Package },
+  ]
 
   return (
     <div className="min-h-screen bg-[#F7F4EE] flex">
