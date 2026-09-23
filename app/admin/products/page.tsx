@@ -335,7 +335,7 @@ export default function AdminProductsPage() {
               {/* Image Upload Section */}
               <div>
                 <label className="block text-xs font-bold text-gray-600 mb-2">Product Image</label>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 items-start">
                   {/* Preview */}
                   <div className="w-28 h-28 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
@@ -366,7 +366,7 @@ export default function AdminProductsPage() {
                       {uploading ? 'Uploading...' : 'Upload Image'}
                     </label>
                     <p className="text-xs text-gray-400">JPG, PNG, WebP · Max 5MB</p>
-                    
+
                     {/* Optional: keep URL field as fallback */}
                     <input
                       value={form.image}
