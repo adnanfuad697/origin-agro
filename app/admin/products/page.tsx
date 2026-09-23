@@ -125,7 +125,6 @@ export default function AdminProductsPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Basic validation
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file (JPG, PNG, WebP, etc.)')
       return
@@ -140,8 +139,8 @@ export default function AdminProductsPage() {
 
     try {
       const ext = file.name.split('.').pop()
-      const fileName = `\( {Date.now()}- \){Math.random().toString(36).slice(2)}.${ext}`
-      const filePath = `products/${fileName}`
+      const fileName = Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext
+      const filePath = 'products/' + fileName
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
@@ -156,7 +155,6 @@ export default function AdminProductsPage() {
         return
       }
 
-      // Get public URL
       const { data } = supabase.storage.from('product-images').getPublicUrl(filePath)
       const publicUrl = data.publicUrl
 
@@ -167,7 +165,6 @@ export default function AdminProductsPage() {
     }
 
     setUploading(false)
-    // Reset file input
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -233,7 +230,7 @@ export default function AdminProductsPage() {
   }
 
   async function handleDelete(id: number, name: string) {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    if (!confirm('Delete "' + name + '"? This cannot be undone.')) return
 
     const { error } = await supabase.from('products').delete().eq('id', id)
     if (error) alert(error.message)
@@ -258,7 +255,6 @@ export default function AdminProductsPage() {
         </button>
       </div>
 
-      {/* Product list */}
       <div className="space-y-3 mb-8">
         {products.length === 0 && (
           <p className="text-sm text-gray-500 bg-white rounded-2xl border p-6 text-center">
@@ -287,7 +283,7 @@ export default function AdminProductsPage() {
               {p.name_bn && <p className="text-xs text-gray-500 truncate">{p.name_bn}</p>}
               <p className="text-xs text-gray-500 mt-0.5">
                 {p.category} · ৳ {Number(p.price).toLocaleString('en-IN')}
-                {p.unit ? ` / ${p.unit}` : ''}
+                {p.unit ? ' / ' + p.unit : ''}
                 {!p.in_stock && (
                   <span className="ml-2 text-red-500 font-bold">Out of stock</span>
                 )}
@@ -314,7 +310,6 @@ export default function AdminProductsPage() {
         ))}
       </div>
 
-      {/* Add / Edit form modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -332,12 +327,10 @@ export default function AdminProductsPage() {
                 <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2">{error}</p>
               )}
 
-              {/* Image Upload Section */}
               <div>
                 <label className="block text-xs font-bold text-gray-600 mb-2">Product Image</label>
 
                 <div className="flex flex-col sm:flex-row gap-4 items-start">
-                  {/* Preview */}
                   <div className="w-28 h-28 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
                     {preview ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -358,16 +351,16 @@ export default function AdminProductsPage() {
                     />
                     <label
                       htmlFor="product-image-upload"
-                      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-300 text-sm font-bold text-gray-600 hover:border-[#0A5C36] hover:text-[#0A5C36] cursor-pointer transition-colors ${
-                        uploading ? 'opacity-50 pointer-events-none' : ''
-                      }`}
+                      className={
+                        'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-300 text-sm font-bold text-gray-600 hover:border-[#0A5C36] hover:text-[#0A5C36] cursor-pointer transition-colors' +
+                        (uploading ? ' opacity-50 pointer-events-none' : '')
+                      }
                     >
                       <Upload className="w-4 h-4" />
                       {uploading ? 'Uploading...' : 'Upload Image'}
                     </label>
                     <p className="text-xs text-gray-400">JPG, PNG, WebP · Max 5MB</p>
 
-                    {/* Optional: keep URL field as fallback */}
                     <input
                       value={form.image}
                       onChange={(e) => {
