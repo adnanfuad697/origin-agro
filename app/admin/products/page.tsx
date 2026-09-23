@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Plus, Pencil, Trash2, X, Save } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Save, Upload, ImageIcon } from 'lucide-react'
 
 interface Product {
   id: number
@@ -51,10 +51,13 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form, setForm] = useState({ ...emptyForm })
   const [error, setError] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function load() {
     setLoading(true)
@@ -74,6 +77,7 @@ export default function AdminProductsPage() {
   function openAdd() {
     setEditingId(null)
     setForm({ ...emptyForm })
+    setPreview(null)
     setError(null)
     setShowForm(true)
   }
@@ -100,6 +104,7 @@ export default function AdminProductsPage() {
       delivery_bn: p.delivery_bn || '',
       in_stock: p.in_stock ?? true,
     })
+    setPreview(p.image || null)
     setError(null)
     setShowForm(true)
   }
@@ -108,11 +113,62 @@ export default function AdminProductsPage() {
     setShowForm(false)
     setEditingId(null)
     setForm({ ...emptyForm })
+    setPreview(null)
     setError(null)
   }
 
   function updateField(key: string, value: string | boolean) {
     setForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Basic validation
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file (JPG, PNG, WebP, etc.)')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be smaller than 5MB')
+      return
+    }
+
+    setUploading(true)
+    setError(null)
+
+    try {
+      const ext = file.name.split('.').pop()
+      const fileName = `\( {Date.now()}- \){Math.random().toString(36).slice(2)}.${ext}`
+      const filePath = `products/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+        })
+
+      if (uploadError) {
+        setError(uploadError.message)
+        setUploading(false)
+        return
+      }
+
+      // Get public URL
+      const { data } = supabase.storage.from('product-images').getPublicUrl(filePath)
+      const publicUrl = data.publicUrl
+
+      setForm((prev) => ({ ...prev, image: publicUrl }))
+      setPreview(publicUrl)
+    } catch (err: any) {
+      setError(err.message || 'Upload failed')
+    }
+
+    setUploading(false)
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -262,7 +318,7 @@ export default function AdminProductsPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between z-10">
               <h3 className="font-extrabold text-gray-900 text-lg">
                 {editingId ? 'Edit Product' : 'Add Product'}
               </h3>
@@ -275,6 +331,55 @@ export default function AdminProductsPage() {
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2">{error}</p>
               )}
+
+              {/* Image Upload Section */}
+              <div>
+                <label className="block text-xs font-bold text-gray-600 mb-2">Product Image</label>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  {/* Preview */}
+                  <div className="w-28 h-28 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
+                    {preview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-gray-300" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="product-image-upload"
+                    />
+                    <label
+                      htmlFor="product-image-upload"
+                      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-300 text-sm font-bold text-gray-600 hover:border-[#0A5C36] hover:text-[#0A5C36] cursor-pointer transition-colors ${
+                        uploading ? 'opacity-50 pointer-events-none' : ''
+                      }`}
+                    >
+                      <Upload className="w-4 h-4" />
+                      {uploading ? 'Uploading...' : 'Upload Image'}
+                    </label>
+                    <p className="text-xs text-gray-400">JPG, PNG, WebP · Max 5MB</p>
+                    
+                    {/* Optional: keep URL field as fallback */}
+                    <input
+                      value={form.image}
+                      onChange={(e) => {
+                        updateField('image', e.target.value)
+                        setPreview(e.target.value || null)
+                      }}
+                      placeholder="Or paste image URL"
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:border-[#0A5C36] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -311,37 +416,30 @@ export default function AdminProductsPage() {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-1">Image URL</label>
-                  <input
-                    value={form.image}
-                    onChange={(e) => updateField('image', e.target.value)}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Price *</label>
+                    <input
+                      type="number"
+                      value={form.price}
+                      onChange={(e) => updateField('price', e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Original Price</label>
+                    <input
+                      type="number"
+                      value={form.original_price}
+                      onChange={(e) => updateField('original_price', e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-1">Price *</label>
-                  <input
-                    type="number"
-                    value={form.price}
-                    onChange={(e) => updateField('price', e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-1">Original Price</label>
-                  <input
-                    type="number"
-                    value={form.original_price}
-                    onChange={(e) => updateField('original_price', e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
-                  />
-                </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-600 mb-1">Unit (EN)</label>
                   <input
@@ -359,15 +457,12 @@ export default function AdminProductsPage() {
                     className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-600 mb-1">Badge (EN)</label>
                   <input
                     value={form.badge}
                     onChange={(e) => updateField('badge', e.target.value)}
-                    placeholder="10% off / Special"
+                    placeholder="10% off"
                     className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
                   />
                 </div>
@@ -395,9 +490,7 @@ export default function AdminProductsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-1">
-                    Description (EN)
-                  </label>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">Description (EN)</label>
                   <textarea
                     value={form.description}
                     onChange={(e) => updateField('description', e.target.value)}
@@ -406,9 +499,7 @@ export default function AdminProductsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-1">
-                    Description (BN)
-                  </label>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">Description (BN)</label>
                   <textarea
                     value={form.description_bn}
                     onChange={(e) => updateField('description_bn', e.target.value)}
@@ -459,7 +550,7 @@ export default function AdminProductsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || uploading}
                   className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0A5C36] text-white text-sm font-bold hover:bg-[#084c2c] disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
