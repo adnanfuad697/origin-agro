@@ -2,13 +2,13 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/contexts/language-context'
 import TopBar from '@/components/top-bar'
 import Navbar from '@/components/navbar'
 import MegaFooter from '@/components/mega-footer'
 import AddressFields from '@/components/address-fields'
+import { mobileToAuthEmail } from '@/lib/auth-helpers'
 import { Trash2, ShoppingBag, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
 interface CartItem {
@@ -24,12 +24,14 @@ function formatTaka(amount: number) {
 }
 
 export default function CartPage() {
-  const router = useRouter()
   const { lang } = useLanguage()
   const [cart, setCart] = useState<CartItem[]>([])
   const [loaded, setLoaded] = useState(false)
 
   const [showCheckout, setShowCheckout] = useState(false)
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
   const [division, setDivision] = useState('')
   const [district, setDistrict] = useState('')
@@ -42,11 +44,38 @@ export default function CartPage() {
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [showPaymentInfo, setShowPaymentInfo] = useState(false)
   const [transactionId, setTransactionId] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
     const stored = JSON.parse(window.localStorage.getItem('origin-agro-cart') || '[]')
     setCart(stored)
     setLoaded(true)
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setIsLoggedIn(true)
+        const meta = session.user.user_metadata || {}
+        if (meta.full_name) setFullName(String(meta.full_name))
+        if (session.user.email && !session.user.email.endsWith('@phone.originagro.local')) {
+          setEmail(session.user.email)
+        }
+        supabase
+          .from('customer_profiles')
+          .select('full_name, mobile_number, division, district, upazila, village_or_area, google_maps_link')
+          .eq('id', session.user.id)
+          .maybeSingle()
+          .then(({ data: profile }) => {
+            if (!profile) return
+            if (profile.full_name) setFullName(profile.full_name)
+            if (profile.mobile_number) setMobileNumber(profile.mobile_number)
+            if (profile.division) setDivision(profile.division)
+            if (profile.district) setDistrict(profile.district)
+            if (profile.upazila) setUpazila(profile.upazila)
+            if (profile.village_or_area) setVillageOrArea(profile.village_or_area)
+            if (profile.google_maps_link) setGoogleMapsLink(profile.google_maps_link)
+          })
+      }
+    })
   }, [])
 
   function saveCart(updated: CartItem[]) {
@@ -68,29 +97,82 @@ export default function CartPage() {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
-  async function handleCheckoutClick() {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      router.push('/account')
-      return
-    }
-
-    const { data: profile } = await supabase
-      .from('customer_profiles')
-      .select('mobile_number, division, district, upazila, village_or_area, google_maps_link')
-      .eq('id', session.user.id)
-      .single()
-
-    if (profile) {
-      if (profile.mobile_number) setMobileNumber(profile.mobile_number)
-      if (profile.division) setDivision(profile.division)
-      if (profile.district) setDistrict(profile.district)
-      if (profile.upazila) setUpazila(profile.upazila)
-      if (profile.village_or_area) setVillageOrArea(profile.village_or_area)
-      if (profile.google_maps_link) setGoogleMapsLink(profile.google_maps_link)
-    }
-
+  function handleCheckoutClick() {
     setShowCheckout(true)
+  }
+
+  async function ensureUserSession(): Promise<{ userId: string } | null> {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      return { userId: session.user.id }
+    }
+
+    if (!fullName.trim()) {
+      setOrderMsg(lang === 'EN' ? 'Please enter your full name.' : 'অনুগ্রহ করে আপনার নাম লিখুন।')
+      return null
+    }
+    if (!mobileNumber.trim()) {
+      setOrderMsg(lang === 'EN' ? 'Please enter your mobile number.' : 'অনুগ্রহ করে মোবাইল নম্বর দিন।')
+      return null
+    }
+    if (!password || password.length < 6) {
+      setOrderMsg(lang === 'EN' ? 'Password must be at least 6 characters.' : 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
+      return null
+    }
+
+    const authEmail = email.trim()
+      ? email.trim().toLowerCase()
+      : mobileToAuthEmail(mobileNumber)
+
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: authEmail,
+      password,
+      options: {
+        data: {
+          full_name: fullName.trim(),
+          mobile_number: mobileNumber.trim(),
+        },
+      },
+    })
+
+    if (signUpError) {
+      const msg = (signUpError.message || '').toLowerCase()
+      if (msg.includes('already') || msg.includes('registered') || msg.includes('exists')) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: authEmail,
+          password,
+        })
+        if (signInError || !signInData.user) {
+          setOrderMsg(
+            lang === 'EN'
+              ? 'Account already exists. Use the correct password, or log in from My Account.'
+              : 'একাউন্ট আগে থেকেই আছে। সঠিক পাসওয়ার্ড দিন, অথবা My Account থেকে লগ ইন করুন।'
+          )
+          return null
+        }
+        return { userId: signInData.user.id }
+      }
+      setOrderMsg(signUpError.message)
+      return null
+    }
+
+    if (signUpData.session?.user) {
+      return { userId: signUpData.session.user.id }
+    }
+
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email: authEmail,
+      password,
+    })
+    if (signInError || !signInData.user) {
+      setOrderMsg(
+        lang === 'EN'
+          ? 'Account created but login failed. Try logging in from My Account.'
+          : 'একাউন্ট তৈরি হয়েছে কিন্তু লগ ইন হয়নি। My Account থেকে লগ ইন করুন।'
+      )
+      return null
+    }
+    return { userId: signInData.user.id }
   }
 
   async function handlePlaceOrder(e: React.FormEvent) {
@@ -99,53 +181,45 @@ export default function CartPage() {
 
     const hasMapsLink = googleMapsLink.trim().length > 0
 
-    if (!mobileNumber) {
+    if (!mobileNumber.trim()) {
       setOrderMsg(lang === 'EN' ? 'Please enter your mobile number.' : 'অনুগ্রহ করে মোবাইল নম্বর দিন।')
       return
     }
     if (!hasMapsLink && (!division || !district || !upazila)) {
-      setOrderMsg(lang === 'EN'
-        ? 'Please provide a Google Maps link, or fill in Division, District, and Upazila.'
-        : 'অনুগ্রহ করে গুগল ম্যাপস লিংক দিন, অথবা বিভাগ, জেলা ও উপজেলা পূরণ করুন।')
+      setOrderMsg(
+        lang === 'EN'
+          ? 'Please provide a Google Maps link, or fill in Division, District, and Upazila.'
+          : 'অনুগ্রহ করে গুগল ম্যাপস লিংক দিন, অথবা বিভাগ, জেলা ও উপজেলা পূরণ করুন।'
+      )
       return
     }
-
     if ((paymentMethod === 'bkash' || paymentMethod === 'nagad') && !transactionId.trim()) {
       setOrderMsg(lang === 'EN' ? 'Please enter the Transaction ID.' : 'অনুগ্রহ করে ট্রানজেকশন আইডি লিখুন।')
       return
     }
 
     setPlacingOrder(true)
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+
+    const user = await ensureUserSession()
+    if (!user) {
       setPlacingOrder(false)
-      router.push('/account')
       return
     }
 
     let addressSummary = ''
-
-if (hasMapsLink) {
-  addressSummary = googleMapsLink
-} else {
-  const parts = []
-  if (villageOrArea && villageOrArea.trim()) {
-    parts.push(villageOrArea.trim())
-  }
-  if (upazila && upazila.trim()) {
-    parts.push(upazila.trim())
-  }
-  if (district && district.trim()) {
-    parts.push(district.trim())
-  }
-  if (division && division.trim()) {
-    parts.push(division.trim())
-  }
-  addressSummary = parts.join(', ')
-}
+    if (hasMapsLink) {
+      addressSummary = googleMapsLink
+    } else {
+      const parts: string[] = []
+      if (villageOrArea && villageOrArea.trim()) parts.push(villageOrArea.trim())
+      if (upazila && upazila.trim()) parts.push(upazila.trim())
+      if (district && district.trim()) parts.push(district.trim())
+      if (division && division.trim()) parts.push(division.trim())
+      addressSummary = parts.join(', ')
+    }
 
     const rows = cart.map((item) => ({
-      user_id: session.user.id,
+      user_id: user.userId,
       product_id: item.productId,
       product_name: item.name,
       product_image: item.image,
@@ -153,7 +227,7 @@ if (hasMapsLink) {
       quantity: item.quantity,
       total_price: item.price * item.quantity,
       delivery_address: addressSummary,
-      mobile_number: mobileNumber,
+      mobile_number: mobileNumber.trim(),
       payment_method: paymentMethod,
       payment_status: 'unpaid',
       transaction_id: transactionId.trim() || null,
@@ -168,23 +242,47 @@ if (hasMapsLink) {
     const { error } = await supabase.from('orders').insert(rows)
 
     if (!error) {
-      await supabase.from('customer_profiles').update({
-        mobile_number: mobileNumber,
+      const { data: existing } = await supabase
+        .from('customer_profiles')
+        .select('id')
+        .eq('id', user.userId)
+        .maybeSingle()
+
+      const profilePayload = {
+        full_name: fullName.trim() || null,
+        mobile_number: mobileNumber.trim(),
         division: division || null,
         district: district || null,
         upazila: upazila || null,
         village_or_area: villageOrArea || null,
         google_maps_link: googleMapsLink || null,
-      }).eq('id', session.user.id)
+      }
+
+      if (existing) {
+        await supabase.from('customer_profiles').update(profilePayload).eq('id', user.userId)
+      } else {
+        await supabase.from('customer_profiles').insert([
+          {
+            id: user.userId,
+            role: 'customer',
+            ...profilePayload,
+          },
+        ])
+      }
     }
 
     setPlacingOrder(false)
 
     if (error) {
-      setOrderMsg(lang === 'EN' ? 'Something went wrong placing your order. Please try again.' : 'অর্ডার করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
+      setOrderMsg(
+        lang === 'EN'
+          ? 'Something went wrong placing your order. Please try again.'
+          : 'অর্ডার করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+      )
     } else {
       saveCart([])
       setOrderPlaced(true)
+      setIsLoggedIn(true)
     }
   }
 
@@ -214,8 +312,8 @@ if (hasMapsLink) {
               </h2>
               <p className="text-gray-600 text-sm mb-6">
                 {lang === 'EN'
-                  ? 'We have received your order. Within a few hours your order history will be updated from Unpaid to Paid after we verify the transaction.'
-                  : 'আমরা আপনার অর্ডার পেয়েছি। ট্রানজেকশন যাচাই করার পর কয়েক ঘণ্টার মধ্যে আপনার অর্ডার হিস্টরি Unpaid থেকে Paid-এ আপডেট হবে।'}
+                  ? 'We have received your order. You can track it from My Account.'
+                  : 'আমরা আপনার অর্ডার পেয়েছি। My Account থেকে ট্র্যাক করতে পারবেন।'}
               </p>
               <a href="/account" className="inline-block bg-[#0A5C36] hover:bg-[#063D24] text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
                 {lang === 'EN' ? 'View My Orders' : 'আমার অর্ডার দেখুন'}
@@ -235,7 +333,6 @@ if (hasMapsLink) {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Items */}
               <div className="lg:col-span-2 space-y-4">
                 {cart.map((item) => (
                   <div key={item.productId} className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4">
@@ -258,7 +355,6 @@ if (hasMapsLink) {
                 ))}
               </div>
 
-              {/* Summary */}
               <div className="bg-white rounded-2xl p-6 shadow-sm h-fit">
                 <h3 className="font-extrabold text-gray-900 mb-4">
                   {lang === 'EN' ? 'Order Summary' : 'অর্ডার সারাংশ'}
@@ -281,12 +377,47 @@ if (hasMapsLink) {
 
                 {showCheckout && (
                   <form onSubmit={handlePlaceOrder} className="space-y-3 mt-2">
+                    {!isLoggedIn && (
+                      <>
+                        <input
+                          type="text"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder={lang === 'EN' ? 'Full Name *' : 'পুরো নাম *'}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                          required
+                        />
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder={lang === 'EN' ? 'Email (optional)' : 'ইমেইল (ঐচ্ছিক)'}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                        />
+                        <input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder={lang === 'EN' ? 'Password * (for My Account)' : 'পাসওয়ার্ড * (অ্যাকাউন্টের জন্য)'}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                          required
+                          minLength={6}
+                        />
+                        <p className="text-[11px] text-gray-500 -mt-1">
+                          {lang === 'EN'
+                            ? 'This creates your account so you can track orders later.'
+                            : 'এতে আপনার অ্যাকাউন্ট তৈরি হবে, পরে অর্ডার ট্র্যাক করতে পারবেন।'}
+                        </p>
+                      </>
+                    )}
+
                     <input
                       type="tel"
                       value={mobileNumber}
                       onChange={(e) => setMobileNumber(e.target.value)}
                       placeholder={lang === 'EN' ? 'Mobile Number *' : 'মোবাইল নম্বর *'}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                      required
                     />
 
                     <AddressFields
@@ -312,7 +443,6 @@ if (hasMapsLink) {
                       <option value="bank">{lang === 'EN' ? 'Bank Transfer' : 'ব্যাংক ট্রান্সফার'}</option>
                     </select>
 
-                    {/* bKash / Nagad Payment Box */}
                     {(paymentMethod === 'bkash' || paymentMethod === 'nagad') && (
                       <div className="bg-[#F7F4EE] border border-[#0A5C36]/20 rounded-xl p-4 space-y-3 text-sm">
                         <p className="font-bold text-gray-900">
