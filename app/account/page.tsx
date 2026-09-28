@@ -32,6 +32,12 @@ export default function AccountPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
 
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwError, setPwError] = useState('')
+  const [pwSaving, setPwSaving] = useState(false)
+
   async function loadSession() {
     setLoadingSession(true)
     const { data: { session } } = await supabase.auth.getSession()
@@ -90,6 +96,30 @@ export default function AccountPage() {
 
   async function handleLogout() {
     await supabase.auth.signOut()
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault()
+    setPwMsg('')
+    setPwError('')
+    if (newPassword.length < 6) {
+      setPwError('Password must be at least 6 characters.')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError('Passwords do not match.')
+      return
+    }
+    setPwSaving(true)
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    setPwSaving(false)
+    if (error) {
+      setPwError(error.message)
+      return
+    }
+    setNewPassword('')
+    setConfirmPassword('')
+    setPwMsg('Password updated successfully.')
   }
 
   return (
@@ -151,6 +181,37 @@ export default function AccountPage() {
                     Log Out
                   </button>
                 </div>
+              </div>
+
+              {/* Change Password */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+                <h3 className="font-bold text-gray-900 mb-1">Change Password</h3>
+                <p className="text-gray-500 text-xs mb-4">পাসওয়ার্ড পরিবর্তন করুন</p>
+                <form onSubmit={handleChangePassword} className="space-y-3 max-w-sm">
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New password"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
+                  />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#0A5C36] focus:outline-none"
+                  />
+                  {pwError && <p className="text-sm text-red-600">{pwError}</p>}
+                  {pwMsg && <p className="text-sm text-[#0A5C36]">{pwMsg}</p>}
+                  <button
+                    type="submit"
+                    disabled={pwSaving}
+                    className="px-4 py-2.5 rounded-xl bg-[#0A5C36] text-white text-sm font-bold disabled:opacity-50"
+                  >
+                    {pwSaving ? 'Saving...' : 'Save new password'}
+                  </button>
+                </form>
               </div>
 
               <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
