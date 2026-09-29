@@ -33,6 +33,18 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
   const [infoMsg, setInfoMsg] = useState('')
   const [showSupportBox, setShowSupportBox] = useState(false)
 
+  function t(en: string, bn: string) {
+    return lang === 'EN' ? en : bn
+  }
+
+  function getWhatsAppHref() {
+    const msg =
+      lang === 'EN'
+        ? 'Hello Origin Agro, I forgot my password. My mobile: ' + loginId.trim()
+        : 'হ্যালো Origin Agro, আমি পাসওয়ার্ড ভুলে গেছি। আমার মোবাইল: ' + loginId.trim()
+    return 'https://wa.me/' + SUPPORT_WHATSAPP + '?text=' + encodeURIComponent(msg)
+  }
+
   async function handleForgotPassword(e: React.FormEvent) {
     e.preventDefault()
     setErrorMsg('')
@@ -41,11 +53,10 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
 
     const id = loginId.trim()
     if (!id) {
-      setErrorMsg(lang === 'EN' ? 'Please enter your email or mobile number.' : 'অনুগ্রহ করে ইমেইল বা মোবাইল নম্বর দিন।')
+      setErrorMsg(t('Please enter your email or mobile number.', 'অনুগ্রহ করে ইমেইল বা মোবাইল নম্বর দিন।'))
       return
     }
 
-    // Mobile-only account → contact support
     if (looksLikeMobile(id)) {
       setShowSupportBox(true)
       return
@@ -63,9 +74,10 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     }
 
     setInfoMsg(
-      lang === 'EN'
-        ? 'If an account exists with that email, a password reset link has been sent. Please check your inbox.'
-        : 'এই ইমেইলে অ্যাকাউন্ট থাকলে পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। ইনবক্স চেক করুন।'
+      t(
+        'If an account exists with that email, a password reset link has been sent. Please check your inbox.',
+        'এই ইমেইলে অ্যাকাউন্ট থাকলে পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। ইনবক্স চেক করুন।'
+      )
     )
   }
 
@@ -76,19 +88,19 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     setShowSupportBox(false)
 
     if (!fullName.trim()) {
-      setErrorMsg(lang === 'EN' ? 'Please enter your full name.' : 'অনুগ্রহ করে আপনার নাম লিখুন।')
+      setErrorMsg(t('Please enter your full name.', 'অনুগ্রহ করে আপনার নাম লিখুন।'))
       return
     }
     if (!mobileNumber.trim()) {
-      setErrorMsg(lang === 'EN' ? 'Please enter your mobile number.' : 'অনুগ্রহ করে মোবাইল নম্বর দিন।')
+      setErrorMsg(t('Please enter your mobile number.', 'অনুগ্রহ করে মোবাইল নম্বর দিন।'))
       return
     }
     if (!password) {
-      setErrorMsg(lang === 'EN' ? 'Please enter a password.' : 'অনুগ্রহ করে পাসওয়ার্ড দিন।')
+      setErrorMsg(t('Please enter a password.', 'অনুগ্রহ করে পাসওয়ার্ড দিন।'))
       return
     }
     if (password.length < 6) {
-      setErrorMsg(lang === 'EN' ? 'Password must be at least 6 characters.' : 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
+      setErrorMsg(t('Password must be at least 6 characters.', 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'))
       return
     }
 
@@ -116,7 +128,6 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       return
     }
 
-    // Create / update profile
     if (data.user) {
       const { data: existing } = await supabase
         .from('customer_profiles')
@@ -139,21 +150,22 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
 
     if (data.session) {
       onSuccess?.()
-    } else {
-      // Try auto login (confirm email is off)
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: authEmail,
-        password,
-      })
-      if (signInError) {
-        setInfoMsg(
-          lang === 'EN'
-            ? 'Account created! You can now log in with your mobile or email and password.'
-            : 'অ্যাকাউন্ট তৈরি হয়েছে! এখন মোবাইল বা ইমেইল এবং পাসওয়ার্ড দিয়ে লগ ইন করুন।'
+      return
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: authEmail,
+      password,
+    })
+    if (signInError) {
+      setInfoMsg(
+        t(
+          'Account created! You can now log in with your mobile or email and password.',
+          'অ্যাকাউন্ট তৈরি হয়েছে! এখন মোবাইল বা ইমেইল এবং পাসওয়ার্ড দিয়ে লগ ইন করুন।'
         )
-      } else {
-        onSuccess?.()
-      }
+      )
+    } else {
+      onSuccess?.()
     }
   }
 
@@ -165,9 +177,10 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
 
     if (!loginId.trim() || !password) {
       setErrorMsg(
-        lang === 'EN'
-          ? 'Please enter your email or mobile number and password.'
-          : 'অনুগ্রহ করে ইমেইল বা মোবাইল নম্বর এবং পাসওয়ার্ড দিন।'
+        t(
+          'Please enter your email or mobile number and password.',
+          'অনুগ্রহ করে ইমেইল বা মোবাইল নম্বর এবং পাসওয়ার্ড দিন।'
+        )
       )
       return
     }
@@ -175,28 +188,18 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     const authEmail = loginIdToAuthEmail(loginId)
 
     setSubmitting(true)
-
     const { error } = await supabase.auth.signInWithPassword({
       email: authEmail,
       password,
     })
-
     setSubmitting(false)
 
     if (error) {
-      setErrorMsg(
-        lang === 'EN'
-          ? 'Invalid login or password. Try again.'
-          : 'লগ ইন বা পাসওয়ার্ড ভুল। আবার চেষ্টা করুন।'
-      )
+      setErrorMsg(t('Invalid login or password. Try again.', 'লগ ইন বা পাসওয়ার্ড ভুল। আবার চেষ্টা করুন।'))
       return
     }
 
     onSuccess?.()
-  }
-
-  function t(en: string, bn: string) {
-    return lang === 'EN' ? en : bn
   }
 
   return (
@@ -204,15 +207,31 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       <div className="flex gap-2 mb-6 bg-gray-100 rounded-xl p-1">
         <button
           type="button"
-          onClick={() => { setMode('login'); setErrorMsg(''); setInfoMsg(''); setShowSupportBox(false) }}
-          className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-white text-[#0A5C36] shadow-sm' : 'text-gray-500'}`}
+          onClick={() => {
+            setMode('login')
+            setErrorMsg('')
+            setInfoMsg('')
+            setShowSupportBox(false)
+          }}
+          className={
+            'flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ' +
+            (mode === 'login' ? 'bg-white text-[#0A5C36] shadow-sm' : 'text-gray-500')
+          }
         >
           {t('Log In', 'লগ ইন')}
         </button>
         <button
           type="button"
-          onClick={() => { setMode('signup'); setErrorMsg(''); setInfoMsg(''); setShowSupportBox(false) }}
-          className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-white text-[#0A5C36] shadow-sm' : 'text-gray-500'}`}
+          onClick={() => {
+            setMode('signup')
+            setErrorMsg('')
+            setInfoMsg('')
+            setShowSupportBox(false)
+          }}
+          className={
+            'flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ' +
+            (mode === 'signup' ? 'bg-white text-[#0A5C36] shadow-sm' : 'text-gray-500')
+          }
         >
           {t('Sign Up', 'সাইন আপ')}
         </button>
@@ -260,39 +279,165 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           )}
 
           {infoMsg && (
-            <p className="text-[#0A5C36] text-sm bg-green-50 border border-green-200 rounded-xl px-4 py-2.5">{infoMsg}</p>
+            <p className="text-[#0A5C36] text-sm bg-[#F7F4EE] border border-[#0A5C36]/20 rounded-xl px-4 py-2.5 flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{infoMsg}</span>
+            </p>
           )}
 
           {showSupportBox && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center space-y-3">
-              <p className="text-amber-800 text-sm">
+            <div className="rounded-2xl border border-[#0A5C36]/25 bg-[#F7F4EE] p-5 text-center space-y-3">
+              <div className="w-12 h-12 mx-auto rounded-full bg-[#0A5C36]/10 flex items-center justify-center">
+                <MessageCircle className="w-6 h-6 text-[#0A5C36]" />
+              </div>
+              <p className="font-extrabold text-gray-900 text-sm">
+                {t('Please contact support', 'অনুগ্রহ করে সাপোর্টে যোগাযোগ করুন')}
+              </p>
+              <p className="text-gray-600 text-xs leading-relaxed">
                 {t(
-                  'Mobile accounts require customer support to reset password.',
-                  'মোবাইল অ্যাকাউন্টগুলোর পাসওয়ার্ড রিসেট করতে কাস্টমার সাপোর্টের সাহায্য প্রয়োজন।'
+                  'This account was created with a mobile number only. Our team can set a temporary password for you.',
+                  'এই অ্যাকাউন্ট শুধু মোবাইল নম্বর দিয়ে তৈরি। আমাদের টিম আপনার জন্য অস্থায়ী পাসওয়ার্ড সেট করে দিতে পারবে।'
                 )}
               </p>
+              <p className="text-sm font-bold text-[#0A5C36]">
+                {t('WhatsApp / Call', 'হোয়াটসঅ্যাপ / কল')}: {SUPPORT_MOBILE}
+              </p>
               <a
-                href={`https://wa.me{SUPPORT_WHATSAPP}?text=${encodeURIComponent(
-                  lang === 'EN'
-                    ? `Hello Origin Agro, I forgot my password. My mobile: ${loginId.trim()}`
-                    : `হ্যালো Origin Agro, আমি পাসওয়ার্ড ভুলে গেছি। আমার মোবাইল: ${loginId.trim()}`
-                )}`}
+                href={getWhatsAppHref()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-[#20ba59] transition-colors w-full"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
-                {t('Contact via WhatsApp', 'হোয়াটসঅ্যাপে যোগাযোগ করুন')}
+                {t('Chat on WhatsApp', 'হোয়াটসঅ্যাপে মেসেজ করুন')}
               </a>
             </div>
+          )}
+
+          {!showSupportBox && (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full py-3.5 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors duration-200 disabled:opacity-60"
+            >
+              {submitting ? t('Please wait...', 'অপেক্ষা করুন...') : t('Continue', 'এগিয়ে যান')}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              setMode('login')
+              setErrorMsg('')
+              setInfoMsg('')
+              setShowSupportBox(false)
+            }}
+            className="w-full text-center text-sm text-gray-500 hover:text-[#0A5C36] font-medium"
+          >
+            {t('Back to Log In', 'লগ ইনে ফিরে যান')}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={mode === 'login' ? handleLogin : handleSignup} className="space-y-4">
+          {mode === 'signup' && (
+            <>
+              <div className="relative">
+                <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder={t('Full Name *', 'পুরো নাম *')}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                />
+              </div>
+              <div className="relative">
+                <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="tel"
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  placeholder={t('Mobile Number *', 'মোবাইল নম্বর *')}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                />
+              </div>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t('Email (optional)', 'ইমেইল (ঐচ্ছিক)')}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                />
+              </div>
+            </>
+          )}
+
+          {mode === 'login' && (
+            <div className="relative">
+              <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
+                placeholder={t('Email or Mobile number', 'ইমেইল অথবা মোবাইল নম্বর')}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+                autoComplete="username"
+              />
+            </div>
+          )}
+
+          <div className="relative">
+            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('Password', 'পাসওয়ার্ড')}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0A5C36] focus:outline-none text-sm"
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+            />
+          </div>
+
+          {mode === 'login' && (
+            <button
+              type="button"
+              onClick={() => {
+                setMode('forgot')
+                setErrorMsg('')
+                setInfoMsg('')
+                setShowSupportBox(false)
+              }}
+              className="text-sm text-[#0A5C36] hover:underline font-medium -mt-2"
+            >
+              {t('Forgot password?', 'পাসওয়ার্ড ভুলে গেছেন?')}
+            </button>
+          )}
+
+          {errorMsg && (
+            <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{errorMsg}</p>
+          )}
+          {infoMsg && (
+            <p className="text-[#0A5C36] text-sm bg-[#F7F4EE] border border-[#0A5C36]/20 rounded-xl px-4 py-2.5 flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{infoMsg}</span>
+            </p>
           )}
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-[#0A5C36] text-white py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-[#084b2c] transition-colors disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl font-bold bg-[#0A5C36] hover:bg-[#063D24] text-white transition-colors duration-200 disabled:opacity-60"
           >
-            {submitting ? t('Sending...', 'পাঠানো হচ্ছে...') : t('Send Reset Link', 'রিসেট লিংক পাঠান')}
+            {submitting
+              ? t('Please wait...', 'অপেক্ষা করুন...')
+              : mode === 'login'
+                ? t('Log In', 'লগ ইন')
+                : t('Sign Up', 'সাইন আপ')}
           </button>
-
-          <div className="text-center pt-2">
+        </form>
+      )}
+    </div>
+  )
+}
